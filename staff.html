@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Portal - Active Staff</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #ffffff;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: #2d2d44;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #3a3a56;
+        }
+
+        .header h1 {
+            color: #ffffff;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 i {
+            color: #4ecdc4;
+        }
+
+        .back-button {
+            background: linear-gradient(135deg, #4a4a68 0%, #363654 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 1px solid #5a5a78;
+        }
+
+        .back-button:hover {
+            background: linear-gradient(135deg, #5a5a78 0%, #464664 100%);
+            transform: translateY(-2px);
+            color: white;
+            text-decoration: none;
+        }
+
+        .stats-bar {
+            background: #2d2d44;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            border: 1px solid #3a3a56;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #4ecdc4;
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .stat-label {
+            color: #9ca3af;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .stat-number.clocked-in {
+            color: #20c997;
+            background: rgba(32, 201, 151, 0.1);
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.5rem;
+            border: 2px solid rgba(32, 201, 151, 0.3);
+            position: relative;
+        }
+
+        .stat-number.clocked-in::before {
+            content: '●';
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            color: #20c997;
+            font-size: 1rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        /* Responsive clocked-in stat styling */
+        @media (max-width: 768px) {
+            .stat-number.clocked-in {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .stat-number.clocked-in {
+                width: 50px;
+                height: 50px;
+                font-size: 1.25rem;
+            }
+
+            .stat-number.clocked-in::before {
+                font-size: 0.8rem;
+                top: -3px;
+                right: -3px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stat-number.clocked-in {
+                width: 45px;
+                height: 45px;
+                font-size: 1.1rem;
+            }
+        }
+
+        @media (max-width: 320px) {
+            .stat-number.clocked-in {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+
+            .stat-number.clocked-in::before {
+                font-size: 0.7rem;
+                top: -2px;
+                right: -2px;
+            }
+        }
+
+        .staff-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-bottom: 2rem;
+        }
+
+        .staff-card {
+            background: #2d2d44;
+            border-radius: 12px;
+            padding: 1.2rem 1.5rem;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            border: 1px solid #3a3a56;
+            height: auto;
+            min-height: 80px;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            text-align: left;
+        }
+
+        .staff-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #4ecdc4, #44a08d);
+        }
+
+        .staff-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+            border-color: #4a4a68;
+        }
+
+        .staff-card.selected {
+            background: #363654;
+            border: 2px solid #4ecdc4;
+        }
+
+        /* Clocked-in indicator */
+        .clocked-in-indicator {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 12px;
+            height: 12px;
+            background: #20c997;
+            border-radius: 50%;
+            box-shadow: 0 0 0 3px rgba(32, 201, 151, 0.3);
+            animation: clockedInPulse 2s infinite;
+            z-index: 10;
+        }
+
+        .clocked-in-indicator::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: inherit;
+            border-radius: inherit;
+            animation: clockedInRipple 2s infinite;
+        }
+
+        @keyframes clockedInPulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.1);
+                opacity: 0.8;
+            }
+        }
+
+        @keyframes clockedInRipple {
+            0% {
+                transform: scale(1);
+                opacity: 0.6;
+            }
+            100% {
+                transform: scale(1.8);
+                opacity: 0;
+            }
+        }
+
+        .clock-section {
+            background: #2d2d44;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            margin-top: 2rem;
+            text-align: center;
+            border: 1px solid #3a3a56;
+        }
+
+        .clock-section h2 {
+            color: #ffffff;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .current-time {
+            font-size: 1.5rem;
+            color: #4ecdc4;
+            margin-bottom: 1rem;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .time-input-group {
+            margin: 1rem 0;
+        }
+
+        .time-input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .time-input {
+            padding: 0.75rem;
+            font-size: 1.1rem;
+            border: 2px solid #4a4a68;
+            border-radius: 8px;
+            background: #3a3a56;
+            color: #ffffff;
+            width: 200px;
+            text-align: center;
+        }
+
+        .time-input:focus {
+            outline: none;
+            border-color: #4ecdc4;
+            box-shadow: 0 0 5px rgba(78, 205, 196, 0.3);
+        }
+
+        .clock-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+
+        .clock-btn {
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            min-width: 150px;
+        }
+
+        .clock-in-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .clock-in-btn:hover {
+            background: linear-gradient(135deg, #218838 0%, #1aa085 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        }
+
+        .clock-out-btn {
+            background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+        }
+
+        .clock-out-btn:hover {
+            background: linear-gradient(135deg, #c82333 0%, #e8680e 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+        }
+
+        .clock-btn:disabled {
+            background: #6c757d !important;
+            cursor: not-allowed !important;
+            transform: none !important;
+        }
+
+        .status-display {
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .status-in {
+            background: rgba(40, 167, 69, 0.2);
+            color: #20c997;
+            border: 1px solid rgba(40, 167, 69, 0.3);
+        }
+
+        .status-out {
+            background: rgba(220, 53, 69, 0.2);
+            color: #fd7e14;
+            border: 1px solid rgba(220, 53, 69, 0.3);
+        }
+
+        .shift-info {
+            background: rgba(78, 205, 196, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border: 1px solid rgba(78, 205, 196, 0.2);
+        }
+
+        .shift-info h4 {
+            color: #4ecdc4;
+            margin-bottom: 0.5rem;
+        }
+
+        .message {
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .message.success {
+            background: rgba(40, 167, 69, 0.2);
+            color: #20c997;
+            border: 1px solid rgba(40, 167, 69, 0.3);
+        }
+
+        .message.error {
+            background: rgba(220, 53, 69, 0.2);
+            color: #fd7e14;
+            border: 1px solid rgba(220, 53, 69, 0.3);
+        }
+
+        .back-to-staff {
+            background: linear-gradient(135deg, #4a4a68 0%, #363654 100%);
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 1rem;
+            border: 1px solid #5a5a78;
+        }
+
+        .back-to-staff:hover {
+            background: linear-gradient(135deg, #5a5a78 0%, #464664 100%);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .staff-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin: 0 1rem 0 0;
+            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
+            flex-shrink: 0;
+        }
+
+        .staff-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .staff-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #ffffff;
+            text-align: left;
+            margin: 0;
+            line-height: 1.3;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            word-break: break-word;
+        }
+
+        .staff-role {
+            background: rgba(78, 205, 196, 0.2);
+            color: #4ecdc4;
+            font-weight: 500;
+            padding: 0.25rem 0.7rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            text-align: left;
+            display: inline-block;
+            width: fit-content;
+            max-width: 200px;
+            margin: 0;
+            border: 1px solid rgba(78, 205, 196, 0.3);
+            line-height: 1.2;
+            word-break: break-word;
+            hyphens: auto;
+        }
+
+        .staff-details {
+            display: grid;
+            gap: 0.5rem;
+        }
+
+        .staff-detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #4a4a68;
+        }
+
+        .staff-detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: #9ca3af;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .detail-value {
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .status-badge {
+            background: #28a745;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .no-staff {
+            background: #2d2d44;
+            padding: 3rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+            border: 1px solid #3a3a56;
+        }
+
+        .no-staff i {
+            font-size: 4rem;
+            color: #4a4a68;
+            margin-bottom: 1rem;
+        }
+
+        .no-staff h3 {
+            color: #ffffff;
+            margin-bottom: 0.5rem;
+        }
+
+        .no-staff p {
+            color: #9ca3af;
+        }
+
+        /* Enhanced Responsive Design */
+        @media (max-width: 1200px) {
+            .container {
+                max-width: 100%;
+                padding: 0 15px;
+            }
+
+            .staff-grid {
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 1.25rem;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .header {
+                padding: 1.5rem;
+            }
+
+            .header h1 {
+                font-size: 1.75rem;
+            }
+
+            .stats-bar {
+                padding: 1.25rem;
+            }
+
+            .staff-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 1rem;
+            }
+
+            .clock-section {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 0 10px;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+                padding: 1.25rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .back-button {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+                align-self: center;
+                width: auto;
+                min-width: 150px;
+            }
+
+            .stats-bar {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 1rem;
+                padding: 1rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .stat-item {
+                min-width: 100px;
+                flex: 1;
+                max-width: 150px;
+            }
+
+            .stat-number {
+                font-size: 1.75rem;
+            }
+
+            .staff-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .staff-card {
+                padding: 1.25rem;
+            }
+
+            .staff-avatar {
+                width: 45px;
+                height: 45px;
+                font-size: 1.1rem;
+                margin: 0 0.8rem 0 0;
+            }
+
+            .staff-name {
+                font-size: 1rem;
+            }
+
+            .staff-role {
+                font-size: 0.75rem;
+                padding: 0.2rem 0.6rem;
+            }
+
+            .clock-section {
+                padding: 1.25rem;
+                margin-top: 1.5rem;
+            }
+
+            .clock-section h2 {
+                font-size: 1.25rem;
+                margin-bottom: 1.25rem;
+            }
+
+            .current-time {
+                font-size: 1.25rem;
+            }
+
+            .clock-buttons {
+                flex-direction: column;
+                align-items: center;
+                gap: 0.75rem;
+            }
+
+            .clock-btn {
+                width: 100%;
+                max-width: 250px;
+                padding: 1rem;
+                font-size: 1rem;
+            }
+
+            .time-input {
+                width: 100%;
+                max-width: 280px;
+                font-size: 1rem;
+            }
+
+            .no-staff {
+                padding: 2rem;
+            }
+
+            .no-staff i {
+                font-size: 3rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            body {
+                padding: 5px;
+            }
+
+            .container {
+                padding: 0 5px;
+            }
+
+            .header {
+                padding: 1rem;
+                border-radius: 12px;
+            }
+
+            .header h1 {
+                font-size: 1.25rem;
+            }
+
+            .back-button {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.85rem;
+                min-width: 130px;
+            }
+
+            .stats-bar {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: space-around;
+                gap: 0.75rem;
+                padding: 1rem;
+            }
+
+            .stat-item {
+                min-width: 90px;
+                flex: 1;
+                max-width: 120px;
+            }
+
+            .stat-number {
+                font-size: 1.5rem;
+            }
+
+            .stat-label {
+                font-size: 0.85rem;
+            }
+
+            .staff-card {
+                padding: 1rem;
+                border-radius: 12px;
+                min-height: 70px;
+            }
+
+            .staff-avatar {
+                width: 42px;
+                height: 42px;
+                font-size: 1rem;
+                margin: 0 0.7rem 0 0;
+            }
+
+            .staff-name {
+                font-size: 0.95rem;
+            }
+
+            .staff-role {
+                font-size: 0.7rem;
+                padding: 0.15rem 0.5rem;
+            }
+
+            .clock-section {
+                padding: 1rem;
+                border-radius: 12px;
+            }
+
+            .clock-section h2 {
+                font-size: 1.1rem;
+                margin-bottom: 1rem;
+            }
+
+            .current-time {
+                font-size: 1.1rem;
+            }
+
+            .time-input {
+                padding: 0.6rem;
+                font-size: 0.95rem;
+                width: 100%;
+                max-width: 240px;
+            }
+
+            .clock-btn {
+                padding: 0.875rem;
+                font-size: 0.95rem;
+                min-width: auto;
+            }
+
+            .status-display {
+                padding: 0.75rem;
+                font-size: 0.9rem;
+            }
+
+            .shift-info {
+                padding: 0.75rem;
+                font-size: 0.85rem;
+            }
+
+            .message {
+                padding: 0.75rem;
+                font-size: 0.9rem;
+            }
+
+            .back-to-staff {
+                padding: 0.4rem 0.75rem;
+                font-size: 0.85rem;
+            }
+
+            .no-staff {
+                padding: 1.5rem;
+            }
+
+            .no-staff i {
+                font-size: 2.5rem;
+            }
+
+            .no-staff h3 {
+                font-size: 1.1rem;
+            }
+
+            .no-staff p {
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.1rem;
+            }
+
+            .header h1 i {
+                font-size: 1rem;
+            }
+
+            .back-button {
+                padding: 0.4rem 0.6rem;
+                font-size: 0.8rem;
+                min-width: 120px;
+            }
+
+            .stats-bar {
+                padding: 0.75rem;
+            }
+
+            .stat-number {
+                font-size: 1.25rem;
+            }
+
+            .stat-label {
+                font-size: 0.8rem;
+            }
+
+            .staff-card {
+                padding: 0.875rem;
+            }
+
+            .staff-avatar {
+                width: 38px;
+                height: 38px;
+                font-size: 0.95rem;
+                margin: 0 0.6rem 0 0;
+            }
+
+            .staff-name {
+                font-size: 0.9rem;
+            }
+
+            .staff-role {
+                font-size: 0.65rem;
+                padding: 0.1rem 0.4rem;
+            }
+
+            .clock-section {
+                padding: 0.875rem;
+            }
+
+            .clock-section h2 {
+                font-size: 1rem;
+            }
+
+            .current-time {
+                font-size: 1rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .time-input {
+                padding: 0.5rem;
+                font-size: 0.9rem;
+                width: 100%;
+                max-width: 200px;
+            }
+
+            .time-input-group label {
+                font-size: 0.9rem;
+            }
+
+            .clock-btn {
+                padding: 0.75rem;
+                font-size: 0.9rem;
+            }
+
+            .clock-buttons {
+                gap: 0.5rem;
+            }
+        }
+
+        @media (max-width: 320px) {
+            .header {
+                padding: 0.75rem;
+            }
+
+            .header h1 {
+                font-size: 1rem;
+            }
+
+            .back-button {
+                padding: 0.35rem 0.5rem;
+                font-size: 0.75rem;
+                min-width: 100px;
+            }
+
+            .stats-bar {
+                padding: 0.5rem;
+                gap: 0.75rem;
+            }
+
+            .stat-number {
+                font-size: 1.1rem;
+            }
+
+            .stat-label {
+                font-size: 0.75rem;
+            }
+
+            .staff-card {
+                padding: 0.75rem;
+            }
+
+            .staff-avatar {
+                width: 35px;
+                height: 35px;
+                font-size: 0.9rem;
+                margin: 0 0.5rem 0 0;
+            }
+
+            .staff-name {
+                font-size: 0.85rem;
+            }
+
+            .staff-role {
+                font-size: 0.6rem;
+            }
+
+            .clock-section {
+                padding: 0.75rem;
+            }
+
+            .clock-section h2 {
+                font-size: 0.95rem;
+            }
+
+            .current-time {
+                font-size: 0.95rem;
+            }
+
+            .time-input {
+                padding: 0.45rem;
+                font-size: 0.85rem;
+                max-width: 180px;
+            }
+
+            .clock-btn {
+                padding: 0.65rem;
+                font-size: 0.85rem;
+            }
+
+            .status-display {
+                padding: 0.5rem;
+                font-size: 0.8rem;
+            }
+
+            .shift-info {
+                padding: 0.5rem;
+                font-size: 0.8rem;
+            }
+
+            .message {
+                padding: 0.5rem;
+                font-size: 0.8rem;
+            }
+
+            .back-to-staff {
+                padding: 0.3rem 0.5rem;
+                font-size: 0.8rem;
+            }
+
+            .no-staff {
+                padding: 1rem;
+            }
+
+            .no-staff i {
+                font-size: 2rem;
+            }
+
+            .no-staff h3 {
+                font-size: 1rem;
+            }
+
+            .no-staff p {
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Improve touch targets for mobile */
+        @media (max-width: 768px) {
+            .staff-card {
+                min-height: 120px;
+                cursor: pointer;
+                -webkit-tap-highlight-color: rgba(78, 205, 196, 0.2);
+            }
+
+            .clock-btn {
+                min-height: 48px;
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            .back-button, .back-to-staff {
+                min-height: 44px;
+                -webkit-tap-highlight-color: transparent;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                <i class="bi bi-people-fill"></i>
+                Staff Portal
+            </h1>
+            <a href="admin.html" class="back-button">
+                <i class="bi bi-arrow-left"></i>
+                Back to Admin
+            </a>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <p class="stat-number" id="activeStaffCount">0</p>
+                <p class="stat-label">Active Staff</p>
+            </div>
+            <div class="stat-item">
+                <p class="stat-number clocked-in" id="clockedInStaffCount">0</p>
+                <p class="stat-label">Clocked In</p>
+            </div>
+            <div class="stat-item">
+                <p class="stat-number" id="totalStaffCount">0</p>
+                <p class="stat-label">Total Staff</p>
+            </div>
+        </div>
+
+        <div class="staff-grid" id="staffGrid">
+            <div class="no-staff">
+                <i class="bi bi-person-x"></i>
+                <h3>No Active Staff</h3>
+                <p>No active staff members found. Add staff members in the admin panel.</p>
+            </div>
+        </div>
+
+        <div class="clock-section hidden" id="clockSection">
+            <button class="back-to-staff" onclick="backToStaffList()">← Back to Staff List</button>
+
+            <h2 id="selectedStaffName">Staff Member</h2>
+
+            <div class="current-time" id="currentTime"></div>
+
+            <div id="statusDisplay" class="status-display">
+                Select time and clock in/out
+            </div>
+
+            <div id="shiftInfo" class="shift-info hidden">
+                <h4>Current Shift</h4>
+                <div id="shiftDetails"></div>
+            </div>
+
+            <div class="time-input-group">
+                <label for="clockTime">Select Time:</label>
+                <input type="datetime-local" id="clockTime" class="time-input">
+            </div>
+
+            <div class="clock-buttons">
+                <button id="clockInBtn" class="clock-btn clock-in-btn" onclick="clockIn()">
+                    <i class="bi bi-clock"></i> Clock In
+                </button>
+                <button id="clockOutBtn" class="clock-btn clock-out-btn" onclick="clockOut()">
+                    <i class="bi bi-clock"></i> Clock Out
+                </button>
+            </div>
+
+            <div id="message" class="message hidden"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let staffMembers = JSON.parse(localStorage.getItem('staffMembers')) || [];
+        let selectedStaff = null;
+        let currentShift = null;
+
+        function getInitials(firstName, lastName, middleName = '') {
+            const first = firstName ? firstName.charAt(0).toUpperCase() : '';
+            const last = lastName ? lastName.charAt(0).toUpperCase() : '';
+            return first + last;
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+
+        function selectStaff(staffId) {
+            selectedStaff = staffMembers.find(s => s.id === staffId);
+            if (!selectedStaff) return;
+
+            // Hide staff grid, show clock section
+            document.getElementById('staffGrid').style.display = 'none';
+            document.querySelector('.stats-bar').style.display = 'none';
+            document.getElementById('clockSection').classList.remove('hidden');
+
+            // Update selected staff name
+            const fullName = `${selectedStaff.firstName} ${selectedStaff.middleName ? selectedStaff.middleName + ' ' : ''}${selectedStaff.lastName}`;
+            document.getElementById('selectedStaffName').textContent = fullName;
+
+            // Set default time to current time (but restrict to today)
+            setCurrentTime();
+            updateStatus();
+        }
+
+        function backToStaffList() {
+            document.getElementById('staffGrid').style.display = 'grid';
+            document.querySelector('.stats-bar').style.display = 'flex';
+            document.getElementById('clockSection').classList.add('hidden');
+            selectedStaff = null;
+            currentShift = null;
+        }
+
+        function setCurrentTime() {
+            const now = new Date();
+            const timeString = now.toISOString().slice(0, 16);
+            document.getElementById('clockTime').value = timeString;
+
+            // Set min to start of today, max to current time
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const todayString = today.toISOString().slice(0, 16);
+
+            document.getElementById('clockTime').min = todayString;
+            document.getElementById('clockTime').max = timeString;
+        }
+
+        function updateStatus() {
+            if (!selectedStaff) return;
+
+            const shifts = JSON.parse(localStorage.getItem('shifts')) || [];
+            const today = new Date().toDateString();
+
+            // Find today's active shift for this staff member
+            currentShift = shifts.find(shift =>
+                shift.staffId === selectedStaff.id &&
+                new Date(shift.clockIn).toDateString() === today &&
+                !shift.clockOut
+            );
+
+            const statusDisplay = document.getElementById('statusDisplay');
+            const clockInBtn = document.getElementById('clockInBtn');
+            const clockOutBtn = document.getElementById('clockOutBtn');
+            const shiftInfo = document.getElementById('shiftInfo');
+            const shiftDetails = document.getElementById('shiftDetails');
+
+            if (currentShift) {
+                statusDisplay.textContent = `Currently Clocked In`;
+                statusDisplay.className = 'status-display status-in';
+
+                clockInBtn.disabled = true;
+                clockOutBtn.disabled = false;
+
+                // Show shift info
+                const clockInTime = new Date(currentShift.clockIn);
+                const duration = Date.now() - clockInTime.getTime();
+                const hours = Math.floor(duration / (1000 * 60 * 60));
+                const minutes = Math.floor((duration % (1000 * 60 * 60)) / (1000 * 60));
+
+                shiftDetails.innerHTML = `
+                    <strong>Clock In:</strong> ${clockInTime.toLocaleString()}<br>
+                    <strong>Duration:</strong> ${hours}h ${minutes}m
+                `;
+                shiftInfo.classList.remove('hidden');
+            } else {
+                statusDisplay.textContent = `Currently Clocked Out`;
+                statusDisplay.className = 'status-display status-out';
+
+                clockInBtn.disabled = false;
+                clockOutBtn.disabled = true;
+
+                shiftInfo.classList.add('hidden');
+            }
+        }
+
+        function validateTime() {
+            const selectedTime = new Date(document.getElementById('clockTime').value);
+            const now = new Date();
+            const todayStart = new Date();
+            todayStart.setHours(0, 0, 0, 0);
+
+            if (selectedTime < todayStart) {
+                showMessage('You can only select times from today', 'error');
+                return false;
+            }
+
+            if (selectedTime > now) {
+                showMessage('You cannot select a future time', 'error');
+                return false;
+            }
+
+            return true;
+        }
+
+        function clockIn() {
+            if (!selectedStaff || !validateTime()) return;
+
+            const selectedTime = new Date(document.getElementById('clockTime').value);
+            const shifts = JSON.parse(localStorage.getItem('shifts')) || [];
+
+            const newShift = {
+                id: Date.now(),
+                staffId: selectedStaff.id,
+                staffName: `${selectedStaff.firstName} ${selectedStaff.lastName}`,
+                clockIn: selectedTime.toISOString(),
+                clockOut: null
+            };
+
+            shifts.push(newShift);
+            localStorage.setItem('shifts', JSON.stringify(shifts));
+
+            showMessage(`Clocked in successfully at ${selectedTime.toLocaleTimeString()}!`, 'success');
+            updateStatus();
+            updateClockedInCount();
+        }
+
+        function clockOut() {
+            if (!selectedStaff || !currentShift || !validateTime()) return;
+
+            const selectedTime = new Date(document.getElementById('clockTime').value);
+            const clockInTime = new Date(currentShift.clockIn);
+
+            if (selectedTime <= clockInTime) {
+                showMessage('Clock out time must be after clock in time', 'error');
+                return;
+            }
+
+            const shifts = JSON.parse(localStorage.getItem('shifts')) || [];
+            const shiftIndex = shifts.findIndex(shift => shift.id === currentShift.id);
+
+            if (shiftIndex !== -1) {
+                shifts[shiftIndex].clockOut = selectedTime.toISOString();
+                localStorage.setItem('shifts', JSON.stringify(shifts));
+
+                showMessage(`Clocked out successfully at ${selectedTime.toLocaleTimeString()}!`, 'success');
+                updateStatus();
+                updateClockedInCount();
+            }
+        }
+
+        function updateClockedInCount() {
+            const clockedInStaffCount = document.getElementById('clockedInStaffCount');
+            const shifts = JSON.parse(localStorage.getItem('shifts')) || [];
+            const today = new Date().toDateString();
+
+            const clockedInStaff = shifts.filter(shift =>
+                new Date(shift.clockIn).toDateString() === today &&
+                !shift.clockOut &&
+                staffMembers.find(staff => staff.id === shift.staffId && (staff.status || 'active') === 'active')
+            );
+
+            clockedInStaffCount.textContent = clockedInStaff.length;
+        }
+
+        function showMessage(text, type) {
+            const message = document.getElementById('message');
+            message.textContent = text;
+            message.className = `message ${type}`;
+            message.classList.remove('hidden');
+
+            setTimeout(() => {
+                message.classList.add('hidden');
+            }, 5000);
+        }
+
+        function updateCurrentTime() {
+            const now = new Date();
+            document.getElementById('currentTime').textContent = now.toLocaleString();
+
+            // Update max time to current time
+            const timeString = now.toISOString().slice(0, 16);
+            document.getElementById('clockTime').max = timeString;
+        }
+
+        function renderStaffGrid() {
+            const staffGrid = document.getElementById('staffGrid');
+            const activeStaffCount = document.getElementById('activeStaffCount');
+            const clockedInStaffCount = document.getElementById('clockedInStaffCount');
+            const totalStaffCount = document.getElementById('totalStaffCount');
+
+            // Filter only active staff and sort alphabetically by first name
+            const activeStaff = staffMembers
+                .filter(staff => (staff.status || 'active') === 'active')
+                .sort((a, b) => a.firstName.localeCompare(b.firstName));
+
+            // Calculate clocked in staff
+            const shifts = JSON.parse(localStorage.getItem('shifts')) || [];
+            const today = new Date().toDateString();
+            const clockedInStaff = shifts.filter(shift =>
+                new Date(shift.clockIn).toDateString() === today &&
+                !shift.clockOut &&
+                staffMembers.find(staff => staff.id === shift.staffId && (staff.status || 'active') === 'active')
+            );
+
+            // Update stats
+            activeStaffCount.textContent = activeStaff.length;
+            clockedInStaffCount.textContent = clockedInStaff.length;
+            totalStaffCount.textContent = staffMembers.length;
+
+            if (activeStaff.length === 0) {
+                staffGrid.innerHTML = `
+                    <div class="no-staff">
+                        <i class="bi bi-person-x"></i>
+                        <h3>No Active Staff</h3>
+                        <p>No active staff members found. Add staff members in the admin panel.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            staffGrid.innerHTML = activeStaff.map(staff => {
+                const fullName = `${staff.firstName} ${staff.middleName ? staff.middleName + ' ' : ''}${staff.lastName}`;
+                const initials = getInitials(staff.firstName, staff.lastName, staff.middleName);
+
+                // Check if staff is currently clocked in
+                const shifts = JSON.parse(localStorage.getItem('shifts')) || [];
+                const activeShift = shifts.find(shift => shift.staffId === staff.id && !shift.clockOut);
+                const clockedInIndicator = activeShift ? '<div class="clocked-in-indicator"></div>' : '';
+
+                return `
+                    <div class="staff-card" onclick="selectStaff(${staff.id})">
+                        ${clockedInIndicator}
+                        <div class="staff-avatar">${initials}</div>
+                        <div class="staff-info">
+                            <div class="staff-name">${fullName}</div>
+                            <div class="staff-role">${staff.role || 'Staff Member'}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Initialize page
+        renderStaffGrid();
+        updateCurrentTime();
+
+        // Update current time every second
+        setInterval(updateCurrentTime, 1000);
+
+        // Update shift duration every minute
+        setInterval(() => {
+            if (currentShift) {
+                updateStatus();
+            }
+        }, 60000);
+
+        // Refresh data every 30 seconds in case staff data is updated in admin
+        setInterval(() => {
+            staffMembers = JSON.parse(localStorage.getItem('staffMembers')) || [];
+            if (!selectedStaff) {
+                renderStaffGrid();
+            }
+        }, 30000);
+    </script>
+</body>
+</html>

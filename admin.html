@@ -1,0 +1,2955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Staff Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
+            padding: 20px;
+            min-height: 100vh;
+            color: #ffffff;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #2d2d44;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+            border: 1px solid #3a3a56;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #4a4a68;
+        }
+
+        h1 {
+            color: #ffffff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        h1::before {
+            content: '👤';
+            color: #4ecdc4;
+            font-size: 0.8em;
+        }
+
+        .back-button {
+            background: linear-gradient(135deg, #4a4a68 0%, #363654 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+            border: 1px solid #5a5a78;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-button:hover {
+            background: linear-gradient(135deg, #5a5a78 0%, #464664 100%);
+            color: white;
+            text-decoration: none;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(74, 74, 104, 0.3);
+        }
+
+        .section {
+            margin-bottom: 2rem;
+        }
+
+        .section h2 {
+            color: #ffffff;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #4a4a68;
+            padding-bottom: 0.5rem;
+        }
+
+        .add-staff-form {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            align-items: center;
+        }
+
+        input[type="text"] {
+            padding: 0.5rem;
+            border: 1px solid #4a4a68;
+            border-radius: 4px;
+            font-size: 1rem;
+            background: #3a3a56;
+            color: #ffffff;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #ff6b6b;
+            box-shadow: 0 0 5px rgba(255, 107, 107, 0.3);
+        }
+
+        button {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s;
+        }
+
+        .add-btn {
+            background: #28a745;
+            color: white;
+        }
+
+        .add-btn:hover {
+            background: #218838;
+        }
+
+        .remove-btn {
+            background: #dc3545;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .remove-btn:hover {
+            background: #c82333;
+        }
+
+        .staff-list {
+            display: grid;
+            gap: 0.5rem;
+        }
+
+        .staff-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            background: #3a3a56;
+            border: 1px solid #4a4a68;
+            border-radius: 4px;
+        }
+
+        .staff-name {
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .shifts-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            background: #3a3a56;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .shifts-table th,
+        .shifts-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #4a4a68;
+            color: #ffffff;
+        }
+
+        .shifts-table th {
+            background: #2a2a3e;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .status-active {
+            color: #20c997 !important;
+            font-weight: bold;
+        }
+
+        .status-inactive {
+            color: #9ca3af !important;
+        }
+
+        .badge-active {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .badge-inactive {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(108, 117, 125, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .no-data {
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+            padding: 2rem;
+        }
+
+        .staff-checkbox {
+            margin-right: 0.5rem;
+        }
+
+        .selected-staff {
+            background-color: #e7f1ff;
+            border: 1px solid #007bff;
+            border-radius: 4px;
+            padding: 0.5rem;
+            margin: 0.25rem;
+            display: inline-block;
+        }
+
+        .status-upcoming {
+            color: #4ecdc4 !important;
+            font-weight: bold;
+        }
+
+        .status-completed {
+            color: #20c997 !important;
+            font-weight: bold;
+        }
+
+        .status-cancelled {
+            color: #fd7e14 !important;
+            font-weight: bold;
+        }
+
+        .badge-upcoming {
+            background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(78, 205, 196, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .badge-completed {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .badge-cancelled {
+            background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        /* Bootstrap Dark Theme Overrides */
+        .table {
+            --bs-table-bg: #3a3a56;
+            --bs-table-color: #ffffff;
+            --bs-table-border-color: #4a4a68;
+            --bs-table-striped-bg: #2d2d44;
+        }
+
+        .table-dark {
+            --bs-table-bg: #2a2a3e;
+            --bs-table-color: #ffffff;
+            --bs-table-border-color: #4a4a68;
+        }
+
+        .modal-content {
+            background-color: #2d2d44;
+            border: 1px solid #4a4a68;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid #4a4a68;
+        }
+
+        .modal-footer {
+            border-top: 1px solid #4a4a68;
+        }
+
+        .modal-title {
+            color: #ffffff;
+        }
+
+        .form-control {
+            background-color: #3a3a56;
+            border: 1px solid #4a4a68;
+            color: #ffffff;
+        }
+
+        .form-control:focus {
+            background-color: #3a3a56;
+            border-color: #4ecdc4;
+            color: #ffffff;
+            box-shadow: 0 0 0 0.2rem rgba(78, 205, 196, 0.25);
+        }
+
+        .form-select {
+            background-color: #3a3a56;
+            border: 1px solid #4a4a68;
+            color: #ffffff;
+        }
+
+        .form-select:focus {
+            background-color: #3a3a56;
+            border-color: #4ecdc4;
+            color: #ffffff;
+            box-shadow: 0 0 0 0.2rem rgba(78, 205, 196, 0.25);
+        }
+
+        .form-label {
+            color: #ffffff;
+        }
+
+        .text-muted {
+            color: #9ca3af !important;
+        }
+
+        .btn-close {
+            filter: invert(1) grayscale(100%) brightness(200%);
+        }
+
+        .border {
+            border-color: #4a4a68 !important;
+        }
+
+        .form-check-label {
+            color: #ffffff;
+        }
+
+        .form-check-input:checked {
+            background-color: #4ecdc4;
+            border-color: #4ecdc4;
+        }
+
+        .form-check-input:focus {
+            border-color: #4ecdc4;
+            box-shadow: 0 0 0 0.2rem rgba(78, 205, 196, 0.25);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+            border: none;
+            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #26d0ce 0%, #1aa085 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            border: none;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #218838 0%, #1aa085 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Fix text visibility issues */
+        .table td, .table th {
+            color: #ffffff !important;
+        }
+
+        .table-striped > tbody > tr:nth-of-type(odd) > td {
+            color: #ffffff !important;
+        }
+
+        .table-striped > tbody > tr:nth-of-type(even) > td {
+            color: #ffffff !important;
+        }
+
+        .shifts-table td, .shifts-table th {
+            color: #ffffff !important;
+        }
+
+        /* Override Bootstrap default colors */
+        .table-bordered td, .table-bordered th {
+            color: #ffffff !important;
+        }
+
+        .table tbody td {
+            color: #ffffff !important;
+        }
+
+        .table thead th {
+            color: #ffffff !important;
+        }
+
+        /* Small text elements */
+        small {
+            color: #9ca3af !important;
+        }
+
+        /* Staff names and general text */
+        .staff-item .staff-name {
+            color: #ffffff !important;
+        }
+
+        /* Headings */
+        h1, h2, h3, h4, h5, h6 {
+            color: #ffffff !important;
+        }
+
+        .section h2 {
+            color: #ffffff !important;
+        }
+
+        /* Muted text */
+        .text-center.text-muted {
+            color: #9ca3af !important;
+        }
+
+        .text-muted {
+            color: #9ca3af !important;
+        }
+
+        .fst-italic {
+            color: #9ca3af !important;
+        }
+
+        /* Ensure table cell content is visible */
+        td small {
+            color: #9ca3af !important;
+        }
+
+        /* Button text should remain as is */
+        .btn {
+            color: white !important;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .container {
+                max-width: 100%;
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .header h1 {
+                font-size: 1.75rem;
+            }
+
+            .back-button {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .table-responsive {
+                font-size: 0.875rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 1rem;
+                border-radius: 8px;
+            }
+
+            .header {
+                padding: 1rem 0;
+                margin-bottom: 1.5rem;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .section {
+                margin-bottom: 1.5rem;
+            }
+
+            .section h2 {
+                font-size: 1.25rem;
+                margin-bottom: 0.75rem;
+            }
+
+            /* Stack buttons vertically on mobile */
+            .header div {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+                width: 100%;
+            }
+
+            .back-button {
+                padding: 0.75rem 1rem;
+                justify-content: center;
+                width: 100%;
+            }
+
+            /* Make table responsive */
+            .table {
+                font-size: 0.8rem;
+            }
+
+            .table th, .table td {
+                padding: 0.5rem 0.25rem;
+                vertical-align: middle;
+            }
+
+            /* Hide less important columns on mobile */
+            .table th:nth-child(4),
+            .table td:nth-child(4),
+            .table th:nth-child(5),
+            .table td:nth-child(5) {
+                display: none;
+            }
+
+            /* Modal adjustments */
+            .modal-dialog {
+                margin: 0.5rem;
+            }
+
+            .modal-body .row {
+                margin: 0;
+            }
+
+            .modal-body .col-md-4,
+            .modal-body .col-md-6 {
+                padding: 0.25rem;
+                margin-bottom: 0.5rem;
+            }
+
+            /* Button adjustments */
+            .btn-sm {
+                padding: 0.25rem 0.5rem;
+                font-size: 0.75rem;
+            }
+
+            /* Stats and info adjustments */
+            .shifts-table {
+                font-size: 0.8rem;
+            }
+
+            .shifts-table th,
+            .shifts-table td {
+                padding: 0.5rem 0.25rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .container {
+                padding: 0.75rem;
+                margin: 5px;
+            }
+
+            .header h1 {
+                font-size: 1.25rem;
+            }
+
+            .section h2 {
+                font-size: 1.1rem;
+            }
+
+            /* Further simplify table on very small screens */
+            .table th:nth-child(3),
+            .table td:nth-child(3) {
+                display: none;
+            }
+
+            /* Stack roster table content */
+            .table td small {
+                display: block;
+                font-size: 0.7rem;
+                line-height: 1.2;
+            }
+
+            /* Adjust modal for very small screens */
+            .modal-body .col-md-4,
+            .modal-body .col-md-6,
+            .modal-body .col-12 {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+
+            /* Compact form elements */
+            .form-control, .form-select {
+                padding: 0.5rem;
+                font-size: 0.9rem;
+            }
+
+            .form-label {
+                font-size: 0.9rem;
+                margin-bottom: 0.25rem;
+            }
+
+            /* Adjust badges */
+            .badge-active,
+            .badge-inactive,
+            .badge-upcoming,
+            .badge-completed,
+            .badge-cancelled {
+                font-size: 0.7rem;
+                padding: 0.2rem 0.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1::before {
+                display: none;
+            }
+
+            .btn {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.85rem;
+            }
+
+            .btn-sm {
+                padding: 0.2rem 0.4rem;
+                font-size: 0.7rem;
+            }
+
+            /* Make action buttons stack */
+            .table td:last-child {
+                min-width: 100px;
+            }
+
+            .table td:last-child .btn {
+                display: block;
+                margin-bottom: 0.25rem;
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 320px) {
+            .container {
+                padding: 0.5rem;
+            }
+
+            .header h1 {
+                font-size: 1.1rem;
+            }
+
+            .section h2 {
+                font-size: 1rem;
+            }
+
+            .back-button {
+                padding: 0.5rem;
+                font-size: 0.8rem;
+            }
+
+            /* Ultra-compact table */
+            .table {
+                font-size: 0.7rem;
+            }
+
+            .table th, .table td {
+                padding: 0.25rem 0.1rem;
+            }
+
+            /* Show only essential columns */
+            .table th:not(:first-child):not(:last-child),
+            .table td:not(:first-child):not(:last-child) {
+                display: none;
+            }
+
+            .table th:last-child,
+            .table td:last-child {
+                width: 40%;
+            }
+        }
+
+        /* Improve table responsiveness with horizontal scroll */
+        .table-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        @media (max-width: 768px) {
+            .table-container {
+                margin: 0 -1rem;
+                padding: 0 1rem;
+            }
+        }
+
+        /* Dark theme for pagination */
+        .pagination .page-link {
+            background-color: #3a3a56;
+            border-color: #4a4a68;
+            color: #ffffff;
+        }
+
+        .pagination .page-link:hover {
+            background-color: #4a4a68;
+            border-color: #5a5a78;
+            color: #ffffff;
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: #4ecdc4;
+            border-color: #4ecdc4;
+            color: #ffffff;
+        }
+
+        /* Card headers and bodies */
+        .card {
+            background-color: #3a3a56 !important;
+            border: 1px solid #4a4a68 !important;
+        }
+
+        .card-header {
+            background-color: #2a2a3e !important;
+            border-bottom: 1px solid #4a4a68 !important;
+        }
+
+        .card-title {
+            color: #ffffff !important;
+        }
+
+        /* Status classes for shift history */
+        .status-completed {
+            color: #20c997 !important;
+            font-weight: bold;
+        }
+
+        .status-active {
+            color: #4ecdc4 !important;
+            font-weight: bold;
+        }
+
+        /* Analytics cards - ensure text is visible */
+        .card .card-title {
+            color: #ffffff !important;
+        }
+
+        .card .card-text {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Admin Panel</h1>
+            <div>
+                <a href="staff.html" class="back-button me-2">
+                    <i class="bi bi-people-fill"></i>
+                    Staff Portal
+                </a>
+                <a href="dashboard.html" class="back-button">
+                    <i class="bi bi-arrow-left"></i>
+                    Back to Dashboard
+                </a>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Staff Management</h2>
+            <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addStaffModal">
+                <i class="bi bi-person-plus"></i>
+                Add New Staff
+            </button>
+
+            <!-- Staff Table -->
+            <div class="table-container">
+                <table class="table table-bordered table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Name</th>
+                        <th>Role</th>
+                        <th>Start Date</th>
+                        <th>Weekday Rate</th>
+                        <th>Visa Status</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="staffTableBody">
+                    <tr>
+                        <td colspan="7" class="text-center text-muted fst-italic py-4">No staff members added yet.</td>
+                    </tr>
+                </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Staff Rostering</h2>
+            <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#addRosterModal">
+                <i class="bi bi-calendar-plus"></i>
+                Create New Roster
+            </button>
+
+            <!-- Roster Table -->
+            <div class="table-container">
+                <table class="table table-bordered table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Date</th>
+                        <th>Job Description</th>
+                        <th>Staff Assigned</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="rosterTableBody">
+                    <tr>
+                        <td colspan="7" class="text-center text-muted fst-italic py-4">No rosters created yet.</td>
+                    </tr>
+                </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Today's Shifts</h2>
+            <table class="shifts-table">
+                <thead>
+                    <tr>
+                        <th>Staff Name</th>
+                        <th>Clock In</th>
+                        <th>Clock Out</th>
+                        <th>Duration</th>
+                        <th>Day Type</th>
+                        <th>Pay Rate</th>
+                        <th>Total Pay</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="shiftsTableBody">
+                    <tr>
+                        <td colspan="8" class="no-data">No shifts recorded for today.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2><i class="bi bi-calendar-event"></i> Public Holiday Management</h2>
+
+            <!-- Holiday Settings Card -->
+            <div class="card mb-4" style="background: #3a3a56; border: 1px solid #4a4a68;">
+                <div class="card-header" style="background: #2a2a3e; border-bottom: 1px solid #4a4a68;">
+                    <h5 class="card-title mb-0" style="color: #ffffff;">
+                        <i class="bi bi-gear"></i> Holiday Settings
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Current State</label>
+                            <select class="form-select" id="holidayState" onchange="updateHolidayState()">
+                                <option value="TAS">Tasmania</option>
+                                <option value="NSW">New South Wales</option>
+                                <option value="VIC">Victoria</option>
+                                <option value="QLD">Queensland</option>
+                                <option value="WA">Western Australia</option>
+                                <option value="SA">South Australia</option>
+                                <option value="ACT">Australian Capital Territory</option>
+                                <option value="NT">Northern Territory</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">View Year</label>
+                            <select class="form-select" id="holidayYear" onchange="loadHolidayCalendar()">
+                                <option value="2025">2025</option>
+                                <option value="2026">2026</option>
+                                <option value="2027">2027</option>
+                                <option value="2028">2028</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-primary mt-4" onclick="loadHolidayCalendar()">
+                                <i class="bi bi-arrow-clockwise"></i> Refresh Calendar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Holiday Calendar Display -->
+            <div class="card mb-4" style="background: #3a3a56; border: 1px solid #4a4a68;">
+                <div class="card-header" style="background: #2a2a3e; border-bottom: 1px solid #4a4a68;">
+                    <h5 class="card-title mb-0" style="color: #ffffff;">
+                        <i class="bi bi-calendar-check"></i> <span id="holidayCalendarTitle">Upcoming Holidays</span> <span id="holidayCalendarYear"></span>
+                    </h5>
+                    <div class="mt-2">
+                        <button class="btn btn-sm btn-outline-light" onclick="showUpcomingHolidays()">
+                            <i class="bi bi-clock"></i> Upcoming (3)
+                        </button>
+                        <button class="btn btn-sm btn-outline-light ms-2" onclick="showFullYearCalendar()">
+                            <i class="bi bi-calendar3"></i> Full Year
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-container">
+                        <table class="table table-bordered table-striped">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Holiday Name</th>
+                                    <th>Days Until</th>
+                                    <th>Day of Week</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="holidayCalendarBody">
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted fst-italic py-4">Loading holiday calendar...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Holiday Test Tool -->
+            <div class="card mb-4" style="background: #3a3a56; border: 1px solid #4a4a68;">
+                <div class="card-header" style="background: #2a2a3e; border-bottom: 1px solid #4a4a68;">
+                    <h5 class="card-title mb-0" style="color: #ffffff;">
+                        <i class="bi bi-search"></i> Holiday Checker Tool
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Check Date</label>
+                            <input type="date" class="form-control" id="checkDate" value="">
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-info mt-4" onclick="checkHolidayStatus()">
+                                <i class="bi bi-calendar-check"></i> Check Holiday
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mt-4">
+                                <div id="holidayCheckResult" class="alert alert-info d-none" role="alert">
+                                    <!-- Result will appear here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><i class="bi bi-calendar3"></i> Shift History & Analytics</h2>
+
+            <!-- Date Range Filter -->
+            <div class="card mb-4" style="background: #3a3a56; border: 1px solid #4a4a68;">
+                <div class="card-header" style="background: #2a2a3e; border-bottom: 1px solid #4a4a68;">
+                    <h5 class="card-title mb-0" style="color: #ffffff;">
+                        <i class="bi bi-funnel"></i> Filter Shifts
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label">From Date</label>
+                            <input type="date" class="form-control" id="filterFromDate">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">To Date</label>
+                            <input type="date" class="form-control" id="filterToDate">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Staff Member</label>
+                            <select class="form-select" id="filterStaff">
+                                <option value="">All Staff</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" id="filterStatus">
+                                <option value="">All Statuses</option>
+                                <option value="completed">Completed</option>
+                                <option value="active">Currently Active</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <button class="btn btn-primary" onclick="applyShiftFilters()">
+                                <i class="bi bi-search"></i> Apply Filters
+                            </button>
+                            <button class="btn btn-secondary ms-2" onclick="clearShiftFilters()">
+                                <i class="bi bi-x-circle"></i> Clear Filters
+                            </button>
+                            <button class="btn btn-success ms-2" onclick="exportShiftData()">
+                                <i class="bi bi-download"></i> Export CSV
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shift Analytics Summary -->
+            <div class="row mb-4">
+                <div class="col-md-2">
+                    <div class="card text-center" style="background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%); border: none;">
+                        <div class="card-body">
+                            <h3 class="card-title text-white mb-1" id="totalShiftsCount">0</h3>
+                            <p class="card-text text-white-50 mb-0">Total Shifts</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card text-center" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border: none;">
+                        <div class="card-body">
+                            <h3 class="card-title text-white mb-1" id="totalHoursWorked">0h</h3>
+                            <p class="card-text text-white-50 mb-0">Total Hours</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card text-center" style="background: linear-gradient(135deg, #6610f2 0%, #6f42c1 100%); border: none;">
+                        <div class="card-body">
+                            <h3 class="card-title text-white mb-1" id="avgShiftLength">0h</h3>
+                            <p class="card-text text-white-50 mb-0">Avg Shift Length</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card text-center" style="background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%); border: none;">
+                        <div class="card-body">
+                            <h3 class="card-title text-white mb-1" id="totalPayroll">$0</h3>
+                            <p class="card-text text-white-50 mb-0">Total Payroll</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card text-center" style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); border: none;">
+                        <div class="card-body">
+                            <h3 class="card-title text-white mb-1" id="avgHourlyRate">$0</h3>
+                            <p class="card-text text-white-50 mb-0">Avg Hourly Rate</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card text-center" style="background: linear-gradient(135deg, #fd7e14 0%, #ffc107 100%); border: none;">
+                        <div class="card-body">
+                            <h3 class="card-title text-white mb-1" id="activeShiftsCount">0</h3>
+                            <p class="card-text text-white-50 mb-0">Active Shifts</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shift History Table -->
+            <div class="table-container">
+                <table class="table table-bordered table-striped">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Date</th>
+                            <th>Staff Name</th>
+                            <th>Role</th>
+                            <th>Clock In</th>
+                            <th>Clock Out</th>
+                            <th>Duration</th>
+                            <th>Day Type</th>
+                            <th>Pay Rate</th>
+                            <th>Total Pay</th>
+                        </tr>
+                    </thead>
+                    <tbody id="shiftHistoryTableBody">
+                        <tr>
+                            <td colspan="9" class="text-center text-muted fst-italic py-4">No shifts found for the selected criteria.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <div>
+                    <span class="text-muted">Showing <span id="shiftResultsInfo">0 results</span></span>
+                </div>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0" id="shiftPagination">
+                        <!-- Pagination will be generated here -->
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Staff Modal -->
+    <div class="modal fade" id="addStaffModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form id="addStaffForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Add New Staff</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Personal Information Section -->
+                        <h6 class="text-primary mb-3"><i class="bi bi-person"></i> Personal Information</h6>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">First Name</label>
+                                <input type="text" class="form-control" name="firstName" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Middle Name</label>
+                                <input type="text" class="form-control" name="middleName">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Last Name</label>
+                                <input type="text" class="form-control" name="lastName" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Date of Birth</label>
+                                <input type="date" class="form-control" name="dob">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Gender</label>
+                                <select class="form-select" name="gender">
+                                    <option value="">Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Visa Status</label>
+                                <select class="form-select" name="visaStatus">
+                                    <option value="">Select Visa Status</option>
+                                    <option value="Citizen">Citizen</option>
+                                    <option value="PR">PR</option>
+                                    <option value="Work Visa">Work Visa</option>
+                                    <option value="Student Visa">Student Visa</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Address Information Section -->
+                        <h6 class="text-primary mb-3 mt-4"><i class="bi bi-house"></i> Address Information</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Street Address</label>
+                                <input type="text" class="form-control" name="streetAddress" placeholder="e.g. 123 Main Street">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Suburb</label>
+                                <input type="text" class="form-control" name="suburb" placeholder="e.g. Sydney CBD">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">State</label>
+                                <select class="form-select" name="state">
+                                    <option value="">Select State</option>
+                                    <option value="NSW">NSW</option>
+                                    <option value="VIC">VIC</option>
+                                    <option value="QLD">QLD</option>
+                                    <option value="WA">WA</option>
+                                    <option value="SA">SA</option>
+                                    <option value="TAS">TAS</option>
+                                    <option value="ACT">ACT</option>
+                                    <option value="NT">NT</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Postcode</label>
+                                <input type="text" class="form-control" name="postcode" placeholder="e.g. 2000">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Country</label>
+                                <input type="text" class="form-control" name="country" value="Australia" placeholder="Australia">
+                            </div>
+                        </div>
+
+                        <!-- Emergency Contact Section -->
+                        <h6 class="text-primary mb-3 mt-4"><i class="bi bi-telephone"></i> Emergency Contact</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Emergency Contact Name</label>
+                                <input type="text" class="form-control" name="emergencyContactName" placeholder="Full name of emergency contact">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Emergency Contact Number</label>
+                                <input type="tel" class="form-control" name="emergencyContactNumber" placeholder="e.g. 0400 123 456">
+                            </div>
+                        </div>
+
+                        <!-- Employment Information Section -->
+                        <h6 class="text-primary mb-3 mt-4"><i class="bi bi-briefcase"></i> Employment Information</h6>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Start Date</label>
+                                <input type="date" class="form-control" name="startDate">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Role</label>
+                                <input type="text" class="form-control" name="role" placeholder="e.g. Chef, Waiter, Manager">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Status</label>
+                                <select class="form-select" name="status">
+                                    <option value="active" selected>Active</option>
+                                    <option value="inactive">Inactive</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Pay Rates Section -->
+                        <h6 class="text-primary mb-3 mt-4"><i class="bi bi-cash-coin"></i> Pay Rates (per hour)</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Weekday Rate ($)</label>
+                                <input type="number" step="0.01" class="form-control" name="weekdayRate" placeholder="e.g. 25.00">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Saturday Rate ($)</label>
+                                <input type="number" step="0.01" class="form-control" name="saturdayRate" placeholder="e.g. 30.00">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Sunday Rate ($)</label>
+                                <input type="number" step="0.01" class="form-control" name="sundayRate" placeholder="e.g. 35.00">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Public Holiday Rate ($)</label>
+                                <input type="number" step="0.01" class="form-control" name="publicHolidayRate" placeholder="e.g. 50.00">
+                            </div>
+                        </div>
+
+                        <!-- Bank Details Section -->
+                        <h6 class="text-primary mb-3 mt-4"><i class="bi bi-bank"></i> Bank Details</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Account Name</label>
+                                <input type="text" class="form-control" name="accountName" placeholder="Full name on bank account">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">BSB</label>
+                                <input type="text" class="form-control" name="bsb" placeholder="e.g. 123-456">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Account Number</label>
+                                <input type="text" class="form-control" name="accountNumber" placeholder="Account number">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Bank Name</label>
+                                <input type="text" class="form-control" name="bankName" placeholder="e.g. Commonwealth Bank">
+                            </div>
+                        </div>
+
+                        <!-- Profile Picture Section -->
+                        <h6 class="text-primary mb-3 mt-4"><i class="bi bi-image"></i> Profile Picture</h6>
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label class="form-label">Profile Picture</label>
+                                <input type="file" class="form-control" name="profilePic" accept="image/*">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Staff Modal -->
+    <div class="modal fade" id="editStaffModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form id="editStaffForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Staff</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="staffId">
+
+                        <!-- Personal Information Section -->
+                        <h6 class="text-primary mb-3"><i class="bi bi-person"></i> Personal Information</h6>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">First Name</label>
+                                <input type="text" class="form-control" name="firstName" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Middle Name</label>
+                                <input type="text" class="form-control" name="middleName">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Last Name</label>
+                                <input type="text" class="form-control" name="lastName" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Date of Birth</label>
+                                <input type="date" class="form-control" name="dob">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Gender</label>
+                                <select class="form-select" name="gender">
+                                    <option value="">Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Visa Status</label>
+                                <select class="form-select" name="visaStatus">
+                                    <option value="">Select Visa Status</option>
+                                    <option value="Citizen">Citizen</option>
+                                    <option value="PR">PR</option>
+                                    <option value="Work Visa">Work Visa</option>
+                                    <option value="Student Visa">Student Visa</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Address Information Section -->
+                        <h6 class="text-primary mb-3 mt-4"><i class="bi bi-house"></i> Address Information</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Street Address</label>
+                                <input type="text" class="form-control" name="streetAddress">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Suburb</label>
+                                <input type="text" class="form-control" name="suburb">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">State</label>
+                                <select class="form-select" name="state">
+                                    <option value="">Select State</option>
+                                    <option value="NSW">NSW</option>
+                                    <option value="VIC">VIC</option>
+                                    <option value="QLD">QLD</option>
+                                    <option value="WA">WA</option>
+                                    <option value="SA">SA</option>
+                                    <option value="TAS">TAS</option>
+                                    <option value="ACT">ACT</option>
+                                    <option value="NT">NT</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Postcode</label>
+                                <input type="text" class="form-control" name="postcode">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Country</label>
+                                <input type="text" class="form-control" name="country">
+                            </div>
+                        </div>
+
+                        <!-- Emergency Contact Section -->
+                        <h6 class="text-primary mb-3 mt-4"><i class="bi bi-telephone"></i> Emergency Contact</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Emergency Contact Name</label>
+                                <input type="text" class="form-control" name="emergencyContactName">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Emergency Contact Number</label>
+                                <input type="tel" class="form-control" name="emergencyContactNumber">
+                            </div>
+                        </div>
+
+                        <!-- Employment Information Section -->
+                        <h6 class="text-primary mb-3 mt-4"><i class="bi bi-briefcase"></i> Employment Information</h6>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Start Date</label>
+                                <input type="date" class="form-control" name="startDate">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Role</label>
+                                <input type="text" class="form-control" name="role">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Status</label>
+                                <select class="form-select" name="status">
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Pay Rates Section -->
+                        <h6 class="text-primary mb-3 mt-4"><i class="bi bi-cash-coin"></i> Pay Rates (per hour)</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Weekday Rate ($)</label>
+                                <input type="number" step="0.01" class="form-control" name="weekdayRate">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Saturday Rate ($)</label>
+                                <input type="number" step="0.01" class="form-control" name="saturdayRate">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Sunday Rate ($)</label>
+                                <input type="number" step="0.01" class="form-control" name="sundayRate">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Public Holiday Rate ($)</label>
+                                <input type="number" step="0.01" class="form-control" name="publicHolidayRate">
+                            </div>
+                        </div>
+
+                        <!-- Bank Details Section -->
+                        <h6 class="text-primary mb-3 mt-4"><i class="bi bi-bank"></i> Bank Details</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Account Name</label>
+                                <input type="text" class="form-control" name="accountName">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">BSB</label>
+                                <input type="text" class="form-control" name="bsb">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Account Number</label>
+                                <input type="text" class="form-control" name="accountNumber">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Bank Name</label>
+                                <input type="text" class="form-control" name="bankName">
+                            </div>
+                        </div>
+
+                        <!-- Profile Picture Section -->
+                        <h6 class="text-primary mb-3 mt-4"><i class="bi bi-image"></i> Profile Picture</h6>
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label class="form-label">Profile Picture</label>
+                                <input type="file" class="form-control" name="profilePic" accept="image/*">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success">Update</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Roster Modal -->
+    <div class="modal fade" id="addRosterModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form id="addRosterForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Create New Roster</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Date</label>
+                                <input type="date" class="form-control" name="rosterDate" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Job Description</label>
+                                <input type="text" class="form-control" name="jobDescription" placeholder="e.g. Wedding Reception, Corporate Event" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Start Time</label>
+                                <input type="time" class="form-control" name="startTime" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">End Time</label>
+                                <input type="time" class="form-control" name="endTime" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Select Staff (Active Only)</label>
+                                <div id="activeStaffList" class="border rounded p-3" style="max-height: 200px; overflow-y: auto;">
+                                    <p class="text-muted">No active staff available.</p>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Additional Notes</label>
+                                <textarea class="form-control" name="notes" rows="3" placeholder="Any special instructions or requirements"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success">Create Roster</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Roster Modal -->
+    <div class="modal fade" id="editRosterModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form id="editRosterForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Roster</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="rosterId">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Date</label>
+                                <input type="date" class="form-control" name="rosterDate" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Job Description</label>
+                                <input type="text" class="form-control" name="jobDescription" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Start Time</label>
+                                <input type="time" class="form-control" name="startTime" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">End Time</label>
+                                <input type="time" class="form-control" name="endTime" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Status</label>
+                                <select class="form-select" name="status">
+                                    <option value="upcoming">Upcoming</option>
+                                    <option value="completed">Completed</option>
+                                    <option value="cancelled">Cancelled</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Select Staff (Active Only)</label>
+                                <div id="editActiveStaffList" class="border rounded p-3" style="max-height: 200px; overflow-y: auto;">
+                                    <p class="text-muted">No active staff available.</p>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Additional Notes</label>
+                                <textarea class="form-control" name="notes" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success">Update Roster</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="public-holidays-config.js"></script>
+    <script>
+        let staffMembers = JSON.parse(localStorage.getItem('staffMembers')) || [];
+        let shifts = JSON.parse(localStorage.getItem('shifts')) || [];
+        let rosters = JSON.parse(localStorage.getItem('rosters')) || [];
+        let staffIdCounter = parseInt(localStorage.getItem('staffIdCounter')) || 1;
+        let rosterIdCounter = parseInt(localStorage.getItem('rosterIdCounter')) || 1;
+
+        // Holiday Management System Variables
+        let systemSettings = JSON.parse(localStorage.getItem('systemSettings')) || {
+            currentState: 'TAS',
+            customHolidays: {}
+        };
+        let currentHolidayView = 'upcoming'; // 'upcoming' or 'full'
+        let currentShiftPage = 1;
+        const shiftsPerPage = 25;
+        let filteredShifts = [];
+
+        // Add Staff Form Handler
+        document.getElementById('addStaffForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+
+            const staff = {
+                id: staffIdCounter++,
+                firstName: formData.get('firstName'),
+                middleName: formData.get('middleName') || '',
+                lastName: formData.get('lastName'),
+                dob: formData.get('dob'),
+                gender: formData.get('gender'),
+                visaStatus: formData.get('visaStatus'),
+                // Address Information
+                streetAddress: formData.get('streetAddress') || '',
+                suburb: formData.get('suburb') || '',
+                state: formData.get('state') || '',
+                postcode: formData.get('postcode') || '',
+                country: formData.get('country') || '',
+                // Emergency Contact
+                emergencyContactName: formData.get('emergencyContactName') || '',
+                emergencyContactNumber: formData.get('emergencyContactNumber') || '',
+                // Employment Information
+                startDate: formData.get('startDate'),
+                role: formData.get('role'),
+                status: formData.get('status') || 'active',
+                // Pay Rates
+                weekdayRate: parseFloat(formData.get('weekdayRate')) || 0,
+                saturdayRate: parseFloat(formData.get('saturdayRate')) || 0,
+                sundayRate: parseFloat(formData.get('sundayRate')) || 0,
+                publicHolidayRate: parseFloat(formData.get('publicHolidayRate')) || 0,
+                // Bank Details
+                accountName: formData.get('accountName') || '',
+                bsb: formData.get('bsb') || '',
+                accountNumber: formData.get('accountNumber') || '',
+                bankName: formData.get('bankName') || '',
+                // Legacy field for compatibility
+                hourlyRate: parseFloat(formData.get('weekdayRate')) || 0,
+                profilePic: '', // File handling would need backend
+                createdAt: new Date().toISOString()
+            };
+
+            staffMembers.push(staff);
+            localStorage.setItem('staffMembers', JSON.stringify(staffMembers));
+            localStorage.setItem('staffIdCounter', staffIdCounter);
+
+            this.reset();
+            bootstrap.Modal.getInstance(document.getElementById('addStaffModal')).hide();
+            renderStaffTable();
+        });
+
+        // Edit Staff Form Handler
+        document.getElementById('editStaffForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const staffId = parseInt(formData.get('staffId'));
+
+            const staffIndex = staffMembers.findIndex(s => s.id === staffId);
+            if (staffIndex !== -1) {
+                staffMembers[staffIndex] = {
+                    ...staffMembers[staffIndex],
+                    firstName: formData.get('firstName'),
+                    middleName: formData.get('middleName') || '',
+                    lastName: formData.get('lastName'),
+                    dob: formData.get('dob'),
+                    gender: formData.get('gender'),
+                    visaStatus: formData.get('visaStatus'),
+                    // Address Information
+                    streetAddress: formData.get('streetAddress') || '',
+                    suburb: formData.get('suburb') || '',
+                    state: formData.get('state') || '',
+                    postcode: formData.get('postcode') || '',
+                    country: formData.get('country') || '',
+                    // Emergency Contact
+                    emergencyContactName: formData.get('emergencyContactName') || '',
+                    emergencyContactNumber: formData.get('emergencyContactNumber') || '',
+                    // Employment Information
+                    startDate: formData.get('startDate'),
+                    role: formData.get('role'),
+                    status: formData.get('status') || 'active',
+                    // Pay Rates
+                    weekdayRate: parseFloat(formData.get('weekdayRate')) || 0,
+                    saturdayRate: parseFloat(formData.get('saturdayRate')) || 0,
+                    sundayRate: parseFloat(formData.get('sundayRate')) || 0,
+                    publicHolidayRate: parseFloat(formData.get('publicHolidayRate')) || 0,
+                    // Bank Details
+                    accountName: formData.get('accountName') || '',
+                    bsb: formData.get('bsb') || '',
+                    accountNumber: formData.get('accountNumber') || '',
+                    bankName: formData.get('bankName') || '',
+                    // Legacy field for compatibility
+                    hourlyRate: parseFloat(formData.get('weekdayRate')) || 0
+                };
+
+                localStorage.setItem('staffMembers', JSON.stringify(staffMembers));
+                bootstrap.Modal.getInstance(document.getElementById('editStaffModal')).hide();
+                renderStaffTable();
+            }
+        });
+
+        function editStaff(staffId) {
+            const staff = staffMembers.find(s => s.id === staffId);
+            if (!staff) return;
+
+            const form = document.getElementById('editStaffForm');
+            form.staffId.value = staff.id;
+
+            // Personal Information
+            form.firstName.value = staff.firstName || '';
+            form.middleName.value = staff.middleName || '';
+            form.lastName.value = staff.lastName || '';
+            form.dob.value = staff.dob || '';
+            form.gender.value = staff.gender || '';
+            form.visaStatus.value = staff.visaStatus || '';
+
+            // Address Information
+            form.streetAddress.value = staff.streetAddress || '';
+            form.suburb.value = staff.suburb || '';
+            form.state.value = staff.state || '';
+            form.postcode.value = staff.postcode || '';
+            form.country.value = staff.country || '';
+
+            // Emergency Contact
+            form.emergencyContactName.value = staff.emergencyContactName || '';
+            form.emergencyContactNumber.value = staff.emergencyContactNumber || '';
+
+            // Employment Information
+            form.startDate.value = staff.startDate || '';
+            form.role.value = staff.role || '';
+            form.status.value = staff.status || 'active';
+
+            // Pay Rates (fallback to legacy hourlyRate if new rates don't exist)
+            form.weekdayRate.value = staff.weekdayRate || staff.hourlyRate || '';
+            form.saturdayRate.value = staff.saturdayRate || '';
+            form.sundayRate.value = staff.sundayRate || '';
+            form.publicHolidayRate.value = staff.publicHolidayRate || '';
+
+            // Bank Details
+            form.accountName.value = staff.accountName || '';
+            form.bsb.value = staff.bsb || '';
+            form.accountNumber.value = staff.accountNumber || '';
+            form.bankName.value = staff.bankName || '';
+
+            new bootstrap.Modal(document.getElementById('editStaffModal')).show();
+        }
+
+        function removeStaff(staffId) {
+            const staff = staffMembers.find(s => s.id === staffId);
+            if (!staff) return;
+
+            const fullName = `${staff.firstName} ${staff.lastName}`;
+            if (confirm(`Are you sure you want to remove ${fullName}?`)) {
+                staffMembers = staffMembers.filter(s => s.id !== staffId);
+                localStorage.setItem('staffMembers', JSON.stringify(staffMembers));
+                renderStaffTable();
+            }
+        }
+
+        function renderStaffTable() {
+            const tbody = document.getElementById('staffTableBody');
+
+            if (staffMembers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted fst-italic py-4">No staff members added yet.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = staffMembers.map(staff => {
+                const fullName = `${staff.firstName} ${staff.middleName ? staff.middleName + ' ' : ''}${staff.lastName}`;
+                const weekdayRate = staff.weekdayRate ? `$${staff.weekdayRate.toFixed(2)}` : (staff.hourlyRate ? `$${staff.hourlyRate.toFixed(2)}` : '-');
+                const startDate = staff.startDate ? new Date(staff.startDate).toLocaleDateString() : '-';
+                const status = staff.status || 'active';
+                const statusBadge = status === 'active' ?
+                    '<span class="badge-active">Active</span>' :
+                    '<span class="badge-inactive">Inactive</span>';
+
+                return `
+                    <tr>
+                        <td>${fullName}</td>
+                        <td>${staff.role || '-'}</td>
+                        <td>${startDate}</td>
+                        <td>${weekdayRate}</td>
+                        <td>${staff.visaStatus || '-'}</td>
+                        <td>${statusBadge}</td>
+                        <td>
+                            <button class="btn btn-sm btn-warning me-1" onclick="editStaff(${staff.id})">
+                                <i class="bi bi-pencil"></i> Edit
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="removeStaff(${staff.id})">
+                                <i class="bi bi-trash"></i> Delete
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderTodayShifts() {
+            const today = new Date().toDateString();
+            const todayShifts = shifts.filter(shift =>
+                new Date(shift.clockIn).toDateString() === today
+            );
+
+            const tbody = document.getElementById('shiftsTableBody');
+
+            if (todayShifts.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted fst-italic py-4">No shifts recorded for today.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = todayShifts.map(shift => {
+                const staff = staffMembers.find(s => s.id === shift.staffId);
+                const clockIn = new Date(shift.clockIn).toLocaleTimeString();
+                const clockOut = shift.clockOut ? new Date(shift.clockOut).toLocaleTimeString() : '-';
+                const status = shift.clockOut ? 'Completed' : 'Active';
+                const statusClass = shift.clockOut ? 'status-completed' : 'status-active';
+
+                // Get day type and determine pay rate
+                const dayType = getShiftDayType(shift.clockIn);
+                let actualPayRate = 0;
+                let duration = '-';
+                let totalPay = '-';
+
+                if (staff) {
+                    // Determine pay rate based on day type
+                    if (dayType.type === 'Public Holiday') {
+                        actualPayRate = staff.publicHolidayRate || staff.weekdayRate || staff.hourlyRate || 0;
+                    } else if (dayType.type === 'Sunday') {
+                        actualPayRate = staff.sundayRate || staff.weekdayRate || staff.hourlyRate || 0;
+                    } else if (dayType.type === 'Saturday') {
+                        actualPayRate = staff.saturdayRate || staff.weekdayRate || staff.hourlyRate || 0;
+                    } else {
+                        actualPayRate = staff.weekdayRate || staff.hourlyRate || 0;
+                    }
+                }
+
+                if (shift.clockOut && staff) {
+                    const durationMs = new Date(shift.clockOut) - new Date(shift.clockIn);
+                    const hours = Math.floor(durationMs / (1000 * 60 * 60));
+                    const minutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
+                    duration = `${hours}h ${minutes}m`;
+
+                    const totalHours = durationMs / (1000 * 60 * 60);
+                    totalPay = `$${(totalHours * actualPayRate).toFixed(2)}`;
+                } else if (!shift.clockOut && staff && actualPayRate > 0) {
+                    // Show running total for active shifts
+                    const currentTime = new Date();
+                    const durationMs = currentTime - new Date(shift.clockIn);
+                    const hours = Math.floor(durationMs / (1000 * 60 * 60));
+                    const minutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
+                    duration = `${hours}h ${minutes}m`;
+
+                    const totalHours = durationMs / (1000 * 60 * 60);
+                    totalPay = `$${(totalHours * actualPayRate).toFixed(2)} <small class="text-muted">(running)</small>`;
+                }
+
+                const payRateDisplay = actualPayRate > 0 ? `$${actualPayRate.toFixed(2)}` : '-';
+
+                return `
+                    <tr>
+                        <td>${shift.staffName}</td>
+                        <td>${clockIn}</td>
+                        <td>${clockOut}</td>
+                        <td>${duration}</td>
+                        <td>
+                            <span class="${dayType.badge}">${dayType.name}</span>
+                            ${dayType.type === 'Public Holiday' ? '<br><small class="text-muted">' + dayType.name + '</small>' : ''}
+                        </td>
+                        <td>${payRateDisplay}</td>
+                        <td>${totalPay}</td>
+                        <td><span class="${statusClass}">${status}</span></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Add Roster Form Handler
+        document.getElementById('addRosterForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+
+            // Get selected staff IDs
+            const selectedStaff = [];
+            const checkboxes = document.querySelectorAll('#activeStaffList input[type="checkbox"]:checked');
+            checkboxes.forEach(checkbox => {
+                const staffId = parseInt(checkbox.value);
+                const staff = staffMembers.find(s => s.id === staffId);
+                if (staff) {
+                    selectedStaff.push({
+                        id: staff.id,
+                        name: `${staff.firstName} ${staff.lastName}`,
+                        role: staff.role
+                    });
+                }
+            });
+
+            if (selectedStaff.length === 0) {
+                alert('Please select at least one staff member.');
+                return;
+            }
+
+            // Validate date (today or future only)
+            const rosterDate = new Date(formData.get('rosterDate'));
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            if (rosterDate < today) {
+                alert('Roster date must be today or in the future.');
+                return;
+            }
+
+            // Validate times
+            const startTime = formData.get('startTime');
+            const endTime = formData.get('endTime');
+            if (startTime >= endTime) {
+                alert('End time must be after start time.');
+                return;
+            }
+
+            const roster = {
+                id: rosterIdCounter++,
+                date: formData.get('rosterDate'),
+                jobDescription: formData.get('jobDescription'),
+                startTime: startTime,
+                endTime: endTime,
+                assignedStaff: selectedStaff,
+                notes: formData.get('notes') || '',
+                status: 'upcoming',
+                createdAt: new Date().toISOString()
+            };
+
+            rosters.push(roster);
+            localStorage.setItem('rosters', JSON.stringify(rosters));
+            localStorage.setItem('rosterIdCounter', rosterIdCounter);
+
+            this.reset();
+            bootstrap.Modal.getInstance(document.getElementById('addRosterModal')).hide();
+            renderRosterTable();
+        });
+
+        // Edit Roster Form Handler
+        document.getElementById('editRosterForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const rosterId = parseInt(formData.get('rosterId'));
+
+            // Get selected staff IDs
+            const selectedStaff = [];
+            const checkboxes = document.querySelectorAll('#editActiveStaffList input[type="checkbox"]:checked');
+            checkboxes.forEach(checkbox => {
+                const staffId = parseInt(checkbox.value);
+                const staff = staffMembers.find(s => s.id === staffId);
+                if (staff) {
+                    selectedStaff.push({
+                        id: staff.id,
+                        name: `${staff.firstName} ${staff.lastName}`,
+                        role: staff.role
+                    });
+                }
+            });
+
+            if (selectedStaff.length === 0) {
+                alert('Please select at least one staff member.');
+                return;
+            }
+
+            // Validate date (today or future only)
+            const rosterDate = new Date(formData.get('rosterDate'));
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            if (rosterDate < today) {
+                alert('Roster date must be today or in the future.');
+                return;
+            }
+
+            // Validate times
+            const startTime = formData.get('startTime');
+            const endTime = formData.get('endTime');
+            if (startTime >= endTime) {
+                alert('End time must be after start time.');
+                return;
+            }
+
+            const rosterIndex = rosters.findIndex(r => r.id === rosterId);
+            if (rosterIndex !== -1) {
+                rosters[rosterIndex] = {
+                    ...rosters[rosterIndex],
+                    date: formData.get('rosterDate'),
+                    jobDescription: formData.get('jobDescription'),
+                    startTime: startTime,
+                    endTime: endTime,
+                    assignedStaff: selectedStaff,
+                    notes: formData.get('notes') || '',
+                    status: formData.get('status')
+                };
+
+                localStorage.setItem('rosters', JSON.stringify(rosters));
+                bootstrap.Modal.getInstance(document.getElementById('editRosterModal')).hide();
+                renderRosterTable();
+            }
+        });
+
+        function populateActiveStaff(containerId) {
+            const container = document.getElementById(containerId);
+            const activeStaff = staffMembers.filter(staff => staff.status === 'active');
+
+            if (activeStaff.length === 0) {
+                container.innerHTML = '<p class="text-muted">No active staff available.</p>';
+                return;
+            }
+
+            container.innerHTML = activeStaff.map(staff => {
+                const fullName = `${staff.firstName} ${staff.lastName}`;
+                return `
+                    <div class="form-check">
+                        <input class="form-check-input staff-checkbox" type="checkbox" value="${staff.id}" id="staff-${containerId}-${staff.id}">
+                        <label class="form-check-label" for="staff-${containerId}-${staff.id}">
+                            ${fullName} - ${staff.role || 'No Role'}
+                        </label>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function editRoster(rosterId) {
+            const roster = rosters.find(r => r.id === rosterId);
+            if (!roster) return;
+
+            const form = document.getElementById('editRosterForm');
+            form.rosterId.value = roster.id;
+            form.rosterDate.value = roster.date;
+            form.jobDescription.value = roster.jobDescription;
+            form.startTime.value = roster.startTime;
+            form.endTime.value = roster.endTime;
+            form.status.value = roster.status;
+            form.notes.value = roster.notes;
+
+            // Populate staff list and pre-select assigned staff
+            populateActiveStaff('editActiveStaffList');
+
+            // Pre-select assigned staff
+            roster.assignedStaff.forEach(assignedStaff => {
+                const checkbox = document.getElementById(`staff-editActiveStaffList-${assignedStaff.id}`);
+                if (checkbox) checkbox.checked = true;
+            });
+
+            new bootstrap.Modal(document.getElementById('editRosterModal')).show();
+        }
+
+        function removeRoster(rosterId) {
+            const roster = rosters.find(r => r.id === rosterId);
+            if (!roster) return;
+
+            if (confirm(`Are you sure you want to delete the roster for "${roster.jobDescription}"?`)) {
+                rosters = rosters.filter(r => r.id !== rosterId);
+                localStorage.setItem('rosters', JSON.stringify(rosters));
+                renderRosterTable();
+            }
+        }
+
+        function renderRosterTable() {
+            const tbody = document.getElementById('rosterTableBody');
+
+            if (rosters.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted fst-italic py-4">No rosters created yet.</td></tr>';
+                return;
+            }
+
+            // Sort rosters by date (newest first)
+            const sortedRosters = [...rosters].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            tbody.innerHTML = sortedRosters.map(roster => {
+                const rosterDate = new Date(roster.date).toLocaleDateString();
+                const staffNames = roster.assignedStaff.map(staff => staff.name).join(', ');
+                const statusBadge = getStatusBadge(roster.status);
+
+                return `
+                    <tr>
+                        <td>${rosterDate}</td>
+                        <td>${roster.jobDescription}</td>
+                        <td><small>${staffNames}</small></td>
+                        <td>${roster.startTime}</td>
+                        <td>${roster.endTime}</td>
+                        <td>${statusBadge}</td>
+                        <td>
+                            <button class="btn btn-sm btn-warning me-1" onclick="editRoster(${roster.id})">
+                                <i class="bi bi-pencil"></i> Edit
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="removeRoster(${roster.id})">
+                                <i class="bi bi-trash"></i> Delete
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function getStatusBadge(status) {
+            switch (status) {
+                case 'upcoming':
+                    return '<span class="badge-upcoming">Upcoming</span>';
+                case 'completed':
+                    return '<span class="badge-completed">Completed</span>';
+                case 'cancelled':
+                    return '<span class="badge-cancelled">Cancelled</span>';
+                default:
+                    return '<span class="badge-upcoming">Upcoming</span>';
+            }
+        }
+
+        // Set minimum date to today for roster date inputs
+        function setMinDate() {
+            const today = new Date().toISOString().split('T')[0];
+            document.querySelector('#addRosterForm input[name="rosterDate"]').min = today;
+            document.querySelector('#editRosterForm input[name="rosterDate"]').min = today;
+        }
+
+        // Event listeners for modals
+        document.getElementById('addRosterModal').addEventListener('show.bs.modal', function() {
+            populateActiveStaff('activeStaffList');
+            setMinDate();
+        });
+
+        document.getElementById('editRosterModal').addEventListener('show.bs.modal', function() {
+            setMinDate();
+        });
+
+        // Initialize page
+        renderStaffTable();
+        renderTodayShifts();
+        renderRosterTable();
+        initializeShiftHistory();
+        initializeHolidayManagement();
+
+        // Refresh shifts data every 30 seconds
+        setInterval(renderTodayShifts, 30000);
+
+        // Shift History and Analytics Functions
+
+        function initializeShiftHistory() {
+            // Set default date range (last 30 days)
+            const today = new Date();
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(today.getDate() - 30);
+
+            document.getElementById('filterFromDate').value = thirtyDaysAgo.toISOString().split('T')[0];
+            document.getElementById('filterToDate').value = today.toISOString().split('T')[0];
+
+            // Populate staff dropdown
+            populateStaffFilter();
+
+            // Load initial data
+            applyShiftFilters();
+        }
+
+        function populateStaffFilter() {
+            const staffSelect = document.getElementById('filterStaff');
+            staffSelect.innerHTML = '<option value="">All Staff</option>';
+
+            staffMembers.forEach(staff => {
+                const fullName = `${staff.firstName} ${staff.lastName}`;
+                staffSelect.innerHTML += `<option value="${staff.id}">${fullName}</option>`;
+            });
+        }
+
+        function applyShiftFilters() {
+            const fromDate = document.getElementById('filterFromDate').value;
+            const toDate = document.getElementById('filterToDate').value;
+            const staffId = document.getElementById('filterStaff').value;
+            const status = document.getElementById('filterStatus').value;
+
+            // Filter shifts based on criteria
+            filteredShifts = shifts.filter(shift => {
+                const shiftDate = new Date(shift.clockIn).toDateString();
+                const fromCheck = !fromDate || new Date(shiftDate) >= new Date(fromDate);
+                const toCheck = !toDate || new Date(shiftDate) <= new Date(toDate);
+                const staffCheck = !staffId || shift.staffId == staffId;
+                let statusCheck = true;
+
+                if (status === 'completed') {
+                    statusCheck = shift.clockOut !== null;
+                } else if (status === 'active') {
+                    statusCheck = shift.clockOut === null;
+                }
+
+                return fromCheck && toCheck && staffCheck && statusCheck;
+            });
+
+            // Sort by most recent first
+            filteredShifts.sort((a, b) => new Date(b.clockIn) - new Date(a.clockIn));
+
+            currentShiftPage = 1;
+            renderShiftHistory();
+            updateShiftAnalytics();
+        }
+
+        function clearShiftFilters() {
+            document.getElementById('filterFromDate').value = '';
+            document.getElementById('filterToDate').value = '';
+            document.getElementById('filterStaff').value = '';
+            document.getElementById('filterStatus').value = '';
+
+            filteredShifts = [...shifts].sort((a, b) => new Date(b.clockIn) - new Date(a.clockIn));
+            currentShiftPage = 1;
+            renderShiftHistory();
+            updateShiftAnalytics();
+        }
+
+        function renderShiftHistory() {
+            const tbody = document.getElementById('shiftHistoryTableBody');
+            const startIndex = (currentShiftPage - 1) * shiftsPerPage;
+            const endIndex = startIndex + shiftsPerPage;
+            const paginatedShifts = filteredShifts.slice(startIndex, endIndex);
+
+            if (paginatedShifts.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted fst-italic py-4">No shifts found for the selected criteria.</td></tr>';
+                updateResultsInfo(0, 0, 0);
+                renderPagination(0);
+                return;
+            }
+
+            tbody.innerHTML = paginatedShifts.map(shift => {
+                const staff = staffMembers.find(s => s.id === shift.staffId);
+                const shiftDate = new Date(shift.clockIn).toLocaleDateString();
+                const clockInTime = new Date(shift.clockIn).toLocaleTimeString();
+                const clockOutTime = shift.clockOut ? new Date(shift.clockOut).toLocaleTimeString() : '-';
+                const staffRole = staff ? staff.role || '-' : '-';
+
+                // Get day type and determine pay rate
+                const dayType = getShiftDayType(shift.clockIn);
+                let actualPayRate = 0;
+                let duration = '-';
+                let totalPay = '-';
+
+                if (staff) {
+                    // Determine pay rate based on day type
+                    if (dayType.type === 'Public Holiday') {
+                        actualPayRate = staff.publicHolidayRate || staff.weekdayRate || staff.hourlyRate || 0;
+                    } else if (dayType.type === 'Sunday') {
+                        actualPayRate = staff.sundayRate || staff.weekdayRate || staff.hourlyRate || 0;
+                    } else if (dayType.type === 'Saturday') {
+                        actualPayRate = staff.saturdayRate || staff.weekdayRate || staff.hourlyRate || 0;
+                    } else {
+                        actualPayRate = staff.weekdayRate || staff.hourlyRate || 0;
+                    }
+                }
+
+                if (shift.clockOut && staff) {
+                    const durationMs = new Date(shift.clockOut) - new Date(shift.clockIn);
+                    const hours = Math.floor(durationMs / (1000 * 60 * 60));
+                    const minutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
+                    duration = `${hours}h ${minutes}m`;
+
+                    const totalHours = durationMs / (1000 * 60 * 60);
+                    totalPay = `$${(totalHours * actualPayRate).toFixed(2)}`;
+                }
+
+                const payRateDisplay = actualPayRate > 0 ? `$${actualPayRate.toFixed(2)}` : '-';
+
+                return `
+                    <tr>
+                        <td>${shiftDate}</td>
+                        <td>${shift.staffName}</td>
+                        <td>${staffRole}</td>
+                        <td>${clockInTime}</td>
+                        <td>${clockOutTime}</td>
+                        <td>${duration}</td>
+                        <td>
+                            <span class="${dayType.badge}">${dayType.name}</span>
+                            ${dayType.type === 'Public Holiday' ? '<br><small class="text-muted">' + dayType.name + '</small>' : ''}
+                        </td>
+                        <td>${payRateDisplay}</td>
+                        <td>${totalPay}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            updateResultsInfo(startIndex + 1, Math.min(endIndex, filteredShifts.length), filteredShifts.length);
+            renderPagination(filteredShifts.length);
+        }
+
+        function updateResultsInfo(start, end, total) {
+            document.getElementById('shiftResultsInfo').textContent = total > 0 ? `${start}-${end} of ${total} results` : `0 results`;
+        }
+
+        function renderPagination(totalItems) {
+            const pagination = document.getElementById('shiftPagination');
+            const totalPages = Math.ceil(totalItems / shiftsPerPage);
+
+            if (totalPages <= 1) {
+                pagination.innerHTML = '';
+                return;
+            }
+
+            let paginationHTML = '';
+
+            // Previous button
+            if (currentShiftPage > 1) {
+                paginationHTML += `<li class="page-item"><a class="page-link" href="#" onclick="changeShiftPage(${currentShiftPage - 1})">Previous</a></li>`;
+            }
+
+            // Page numbers
+            const startPage = Math.max(1, currentShiftPage - 2);
+            const endPage = Math.min(totalPages, currentShiftPage + 2);
+
+            for (let i = startPage; i <= endPage; i++) {
+                const activeClass = i === currentShiftPage ? 'active' : '';
+                paginationHTML += `<li class="page-item ${activeClass}"><a class="page-link" href="#" onclick="changeShiftPage(${i})">${i}</a></li>`;
+            }
+
+            // Next button
+            if (currentShiftPage < totalPages) {
+                paginationHTML += `<li class="page-item"><a class="page-link" href="#" onclick="changeShiftPage(${currentShiftPage + 1})">Next</a></li>`;
+            }
+
+            pagination.innerHTML = paginationHTML;
+        }
+
+        function changeShiftPage(page) {
+            currentShiftPage = page;
+            renderShiftHistory();
+        }
+
+        function updateShiftAnalytics() {
+            const completedShifts = filteredShifts.filter(shift => shift.clockOut);
+            const activeShifts = filteredShifts.filter(shift => !shift.clockOut);
+
+            // Total shifts
+            document.getElementById('totalShiftsCount').textContent = filteredShifts.length;
+
+            // Active shifts
+            document.getElementById('activeShiftsCount').textContent = activeShifts.length;
+
+            // Calculate total hours, payroll, and analytics
+            let totalHours = 0;
+            let totalPayroll = 0;
+            let totalPayableHours = 0; // Hours with valid pay rates
+
+            completedShifts.forEach(shift => {
+                const staff = staffMembers.find(s => s.id === shift.staffId);
+                const durationMs = new Date(shift.clockOut) - new Date(shift.clockIn);
+                const hours = durationMs / (1000 * 60 * 60);
+                totalHours += hours;
+
+                if (staff) {
+                    // Get day type and determine pay rate
+                    const dayType = getShiftDayType(shift.clockIn);
+                    let actualPayRate = 0;
+
+                    if (dayType.type === 'Public Holiday') {
+                        actualPayRate = staff.publicHolidayRate || staff.weekdayRate || staff.hourlyRate || 0;
+                    } else if (dayType.type === 'Sunday') {
+                        actualPayRate = staff.sundayRate || staff.weekdayRate || staff.hourlyRate || 0;
+                    } else if (dayType.type === 'Saturday') {
+                        actualPayRate = staff.saturdayRate || staff.weekdayRate || staff.hourlyRate || 0;
+                    } else {
+                        actualPayRate = staff.weekdayRate || staff.hourlyRate || 0;
+                    }
+
+                    if (actualPayRate > 0) {
+                        totalPayroll += hours * actualPayRate;
+                        totalPayableHours += hours;
+                    }
+                }
+            });
+
+            // Format and display values
+            const totalHoursFormatted = totalHours > 0 ? `${Math.floor(totalHours)}h ${Math.floor((totalHours % 1) * 60)}m` : '0h';
+            document.getElementById('totalHoursWorked').textContent = totalHoursFormatted;
+
+            const avgHours = completedShifts.length > 0 ? totalHours / completedShifts.length : 0;
+            const avgHoursFormatted = avgHours > 0 ? `${Math.floor(avgHours)}h ${Math.floor((avgHours % 1) * 60)}m` : '0h';
+            document.getElementById('avgShiftLength').textContent = avgHoursFormatted;
+
+            // Payroll calculations
+            const totalPayrollFormatted = totalPayroll > 0 ? `$${totalPayroll.toFixed(2)}` : '$0';
+            document.getElementById('totalPayroll').textContent = totalPayrollFormatted;
+
+            const avgHourlyRate = totalPayableHours > 0 ? totalPayroll / totalPayableHours : 0;
+            const avgHourlyRateFormatted = avgHourlyRate > 0 ? `$${avgHourlyRate.toFixed(2)}` : '$0';
+            document.getElementById('avgHourlyRate').textContent = avgHourlyRateFormatted;
+        }
+
+        function exportShiftData() {
+            if (filteredShifts.length === 0) {
+                alert('No data to export.');
+                return;
+            }
+
+            // Create CSV content with smart pay calculations
+            const headers = ['Date', 'Staff Name', 'Role', 'Clock In', 'Clock Out', 'Duration (Hours)', 'Day Type', 'Holiday Name', 'Status', 'Pay Rate Used', 'Total Pay'];
+            let csvContent = headers.join(',') + '\n';
+
+            filteredShifts.forEach(shift => {
+                const staff = staffMembers.find(s => s.id === shift.staffId);
+                const shiftDate = new Date(shift.clockIn).toLocaleDateString();
+                const clockInTime = new Date(shift.clockIn).toLocaleTimeString();
+                const clockOutTime = shift.clockOut ? new Date(shift.clockOut).toLocaleTimeString() : '';
+                const status = shift.clockOut ? 'Completed' : 'Active';
+                const staffRole = staff ? staff.role || '' : '';
+
+                // Get day type and determine pay rate
+                const dayType = getShiftDayType(shift.clockIn);
+                let actualPayRate = 0;
+                let durationHours = '';
+                let totalPay = '';
+
+                if (staff) {
+                    // Determine pay rate based on day type
+                    if (dayType.type === 'Public Holiday') {
+                        actualPayRate = staff.publicHolidayRate || staff.weekdayRate || staff.hourlyRate || 0;
+                    } else if (dayType.type === 'Sunday') {
+                        actualPayRate = staff.sundayRate || staff.weekdayRate || staff.hourlyRate || 0;
+                    } else if (dayType.type === 'Saturday') {
+                        actualPayRate = staff.saturdayRate || staff.weekdayRate || staff.hourlyRate || 0;
+                    } else {
+                        actualPayRate = staff.weekdayRate || staff.hourlyRate || 0;
+                    }
+                }
+
+                if (shift.clockOut) {
+                    const durationMs = new Date(shift.clockOut) - new Date(shift.clockIn);
+                    durationHours = (durationMs / (1000 * 60 * 60)).toFixed(2);
+
+                    if (staff && actualPayRate > 0) {
+                        totalPay = (durationHours * actualPayRate).toFixed(2);
+                    }
+                }
+
+                const payRateUsed = actualPayRate > 0 ? actualPayRate.toFixed(2) : '';
+                const holidayName = dayType.type === 'Public Holiday' ? dayType.name : '';
+
+                const row = [
+                    shiftDate,
+                    `"${shift.staffName}"`,
+                    `"${staffRole}"`,
+                    clockInTime,
+                    clockOutTime,
+                    durationHours,
+                    `"${dayType.type}"`,
+                    `"${holidayName}"`,
+                    status,
+                    payRateUsed,
+                    totalPay
+                ];
+
+                csvContent += row.join(',') + '\n';
+            });
+
+            // Download CSV
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `shift_data_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Holiday Management System
+
+        function initializeHolidayManagement() {
+            console.log('Initializing holiday management...');
+            console.log('HolidayCalculator available:', typeof HolidayCalculator !== 'undefined');
+            console.log('System settings:', systemSettings);
+
+            // Set current state in dropdown
+            document.getElementById('holidayState').value = systemSettings.currentState;
+
+            // Set current year
+            const currentYear = new Date().getFullYear();
+            document.getElementById('holidayYear').value = currentYear;
+
+            // Set today's date in checker
+            document.getElementById('checkDate').value = new Date().toISOString().split('T')[0];
+
+            // Load initial calendar - start with upcoming holidays
+            console.log('Loading upcoming holidays...');
+            showUpcomingHolidays();
+        }
+
+        function updateHolidayState() {
+            const selectedState = document.getElementById('holidayState').value;
+            systemSettings.currentState = selectedState;
+            localStorage.setItem('systemSettings', JSON.stringify(systemSettings));
+            loadHolidayCalendar();
+        }
+
+        function loadHolidayCalendar() {
+            if (currentHolidayView === 'upcoming') {
+                showUpcomingHolidays();
+            } else {
+                showFullYearCalendar();
+            }
+        }
+
+        function showUpcomingHolidays() {
+            currentHolidayView = 'upcoming';
+            const state = document.getElementById('holidayState').value;
+
+            document.getElementById('holidayCalendarTitle').textContent = 'Upcoming Holidays';
+            document.getElementById('holidayCalendarYear').textContent = `(${state})`;
+
+            console.log('Getting upcoming holidays for state:', state);
+
+            // Get upcoming holidays
+            const upcomingHolidays = getUpcomingHolidays(3);
+            console.log('Found upcoming holidays:', upcomingHolidays);
+
+            const tbody = document.getElementById('holidayCalendarBody');
+
+            if (upcomingHolidays.length === 0) {
+                console.log('No upcoming holidays found');
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted fst-italic py-4">No upcoming holidays found.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = upcomingHolidays.map(holiday => {
+                const dayOfWeek = holiday.date.toLocaleDateString('en-AU', { weekday: 'long' });
+                const formattedDate = holiday.date.toLocaleDateString('en-AU', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                });
+
+                const daysUntil = getDaysUntilHoliday(holiday.date);
+
+                // Determine urgency class
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const diffDays = Math.ceil((holiday.date - today) / (1000 * 60 * 60 * 24));
+
+                let urgencyBadge = '';
+                if (diffDays === 0) {
+                    urgencyBadge = '<span class="badge bg-danger ms-2">TODAY</span>';
+                } else if (diffDays === 1) {
+                    urgencyBadge = '<span class="badge bg-warning text-dark ms-2">TOMORROW</span>';
+                } else if (diffDays <= 7) {
+                    urgencyBadge = '<span class="badge bg-info ms-2">THIS WEEK</span>';
+                }
+
+                // Check if it's a weekend
+                const isWeekend = holiday.date.getDay() === 0 || holiday.date.getDay() === 6;
+                const weekendBadge = isWeekend ? ' <span class="badge bg-warning text-dark">Weekend</span>' : '';
+
+                return `
+                    <tr>
+                        <td><strong>${formattedDate}</strong></td>
+                        <td>
+                            ${holiday.name}
+                            ${weekendBadge}
+                            ${urgencyBadge}
+                        </td>
+                        <td><strong>${daysUntil}</strong></td>
+                        <td>${dayOfWeek}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-warning" onclick="editHoliday('${holiday.code}', '${holiday.date.toISOString().split('T')[0]}', '${holiday.name}')">
+                                <i class="bi bi-pencil"></i> Edit
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function showFullYearCalendar() {
+            currentHolidayView = 'full';
+            const state = document.getElementById('holidayState').value;
+            const year = parseInt(document.getElementById('holidayYear').value);
+
+            document.getElementById('holidayCalendarTitle').textContent = 'Full Year Calendar';
+            document.getElementById('holidayCalendarYear').textContent = `(${year} - ${state})`;
+
+            // Get holidays for the selected year and state
+            const holidays = HolidayCalculator.getHolidaysForYear(state, year);
+
+            const tbody = document.getElementById('holidayCalendarBody');
+
+            if (holidays.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted fst-italic py-4">No holidays configured for this year.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = holidays.map(holiday => {
+                const dayOfWeek = holiday.date.toLocaleDateString('en-AU', { weekday: 'long' });
+                const formattedDate = holiday.date.toLocaleDateString('en-AU', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                });
+
+                // Determine holiday type
+                let holidayType = 'Standard';
+                if (holiday.name.includes('Easter')) holidayType = 'Easter-based';
+                if (holiday.name.includes('Day') && (dayOfWeek === 'Monday' || dayOfWeek === 'Tuesday')) holidayType = 'Long Weekend';
+                if (holiday.name.includes('Christmas') || holiday.name.includes('Boxing')) holidayType = 'Christmas Period';
+
+                // Check if it's a weekend
+                const isWeekend = holiday.date.getDay() === 0 || holiday.date.getDay() === 6;
+                const weekendBadge = isWeekend ? ' <span class="badge bg-warning text-dark">Weekend</span>' : '';
+
+                // Calculate days until for comparison
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const daysUntil = Math.ceil((holiday.date - today) / (1000 * 60 * 60 * 24));
+                const daysUntilText = daysUntil >= 0 ? getDaysUntilHoliday(holiday.date) : 'Past';
+
+                return `
+                    <tr>
+                        <td><strong>${formattedDate}</strong></td>
+                        <td>
+                            ${holiday.name}
+                            ${weekendBadge}
+                        </td>
+                        <td>${daysUntilText}</td>
+                        <td>${dayOfWeek}</td>
+                        <td>
+                            <small class="text-muted">${holidayType}</small>
+                            <button class="btn btn-sm btn-outline-warning ms-2" onclick="editHoliday('${holiday.code}', '${holiday.date.toISOString().split('T')[0]}', '${holiday.name}')">
+                                <i class="bi bi-pencil"></i> Edit
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function checkHolidayStatus() {
+            const checkDate = document.getElementById('checkDate').value;
+            const state = document.getElementById('holidayState').value;
+
+            if (!checkDate) {
+                document.getElementById('holidayCheckResult').className = 'alert alert-warning';
+                document.getElementById('holidayCheckResult').innerHTML = '<strong>Please select a date to check.</strong>';
+                document.getElementById('holidayCheckResult').classList.remove('d-none');
+                return;
+            }
+
+            const date = new Date(checkDate);
+            const isHoliday = HolidayCalculator.isPublicHoliday(date, state);
+            const holidayDetails = HolidayCalculator.getHolidayDetails(date, state);
+
+            const resultDiv = document.getElementById('holidayCheckResult');
+
+            if (isHoliday && holidayDetails) {
+                resultDiv.className = 'alert alert-success';
+                resultDiv.innerHTML = `
+                    <strong><i class="bi bi-check-circle"></i> Public Holiday!</strong><br>
+                    <strong>${holidayDetails.name}</strong><br>
+                    Date: ${date.toLocaleDateString('en-AU', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })}<br>
+                    <small>This date will use Public Holiday pay rates.</small>
+                `;
+            } else {
+                const dayOfWeek = date.getDay();
+                let dayType = 'Weekday';
+                if (dayOfWeek === 6) dayType = 'Saturday';
+                if (dayOfWeek === 0) dayType = 'Sunday';
+
+                resultDiv.className = 'alert alert-secondary';
+                resultDiv.innerHTML = `
+                    <strong><i class="bi bi-calendar"></i> Regular Day</strong><br>
+                    This is a regular <strong>${dayType.toLowerCase()}</strong>.<br>
+                    <small>Will use ${dayType} pay rates.</small>
+                `;
+            }
+
+            resultDiv.classList.remove('d-none');
+        }
+
+        function editHoliday(holidayCode, dateString, holidayName) {
+            const newName = prompt(`Edit holiday name for ${dateString}:`, holidayName);
+            if (newName && newName !== holidayName) {
+                // Store custom holiday override
+                const year = new Date(dateString).getFullYear();
+                const state = document.getElementById('holidayState').value;
+
+                if (!systemSettings.customHolidays[year]) {
+                    systemSettings.customHolidays[year] = {};
+                }
+                if (!systemSettings.customHolidays[year][state]) {
+                    systemSettings.customHolidays[year][state] = [];
+                }
+
+                // Update or add custom holiday
+                const existingIndex = systemSettings.customHolidays[year][state].findIndex(h => h.date === dateString);
+                if (existingIndex >= 0) {
+                    systemSettings.customHolidays[year][state][existingIndex].name = newName;
+                } else {
+                    systemSettings.customHolidays[year][state].push({
+                        date: dateString,
+                        name: newName,
+                        custom: true
+                    });
+                }
+
+                localStorage.setItem('systemSettings', JSON.stringify(systemSettings));
+                loadHolidayCalendar();
+
+                alert(`Holiday updated successfully!\n\nNote: This is a local override. For official changes, update the configuration file.`);
+            }
+        }
+
+        // Enhanced shift calculation with holiday detection
+        function calculateShiftPay(staff, clockIn, clockOut) {
+            if (!clockOut) return 0;
+
+            const startDate = new Date(clockIn);
+            const endDate = new Date(clockOut);
+            const durationMs = endDate - startDate;
+            const hours = durationMs / (1000 * 60 * 60);
+
+            // Determine pay rate based on day type
+            let hourlyRate = staff.weekdayRate || staff.hourlyRate || 0;
+
+            // Check if it's a public holiday
+            if (HolidayCalculator.isPublicHoliday(startDate, systemSettings.currentState)) {
+                hourlyRate = staff.publicHolidayRate || hourlyRate;
+            } else {
+                // Check day of week
+                const dayOfWeek = startDate.getDay();
+                if (dayOfWeek === 0) { // Sunday
+                    hourlyRate = staff.sundayRate || hourlyRate;
+                } else if (dayOfWeek === 6) { // Saturday
+                    hourlyRate = staff.saturdayRate || hourlyRate;
+                }
+            }
+
+            return hours * hourlyRate;
+        }
+
+        // Enhanced shift display with pay rate information
+        function getShiftDayType(date) {
+            const checkDate = new Date(date);
+
+            // Check if it's a public holiday first
+            if (HolidayCalculator.isPublicHoliday(checkDate, systemSettings.currentState)) {
+                const holidayDetails = HolidayCalculator.getHolidayDetails(checkDate, systemSettings.currentState);
+                return {
+                    type: 'Public Holiday',
+                    name: holidayDetails ? holidayDetails.name : 'Public Holiday',
+                    badge: 'badge bg-danger'
+                };
+            }
+
+            // Check day of week
+            const dayOfWeek = checkDate.getDay();
+            if (dayOfWeek === 0) {
+                return { type: 'Sunday', name: 'Sunday', badge: 'badge bg-info' };
+            } else if (dayOfWeek === 6) {
+                return { type: 'Saturday', name: 'Saturday', badge: 'badge bg-primary' };
+            } else {
+                return { type: 'Weekday', name: 'Weekday', badge: 'badge bg-secondary' };
+            }
+        }
+
+        // Upcoming Holidays Helper Functions
+        function getUpcomingHolidays(count = 3) {
+            const currentState = systemSettings.currentState;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Set to start of day for comparison
+
+            const currentYear = today.getFullYear();
+            const nextYear = currentYear + 1;
+
+            console.log('Getting holidays for:', { currentState, currentYear, nextYear });
+
+            // Check if HolidayCalculator is available
+            if (typeof HolidayCalculator === 'undefined') {
+                console.error('HolidayCalculator not found - public-holidays-config.js may not be loaded');
+                return [];
+            }
+
+            try {
+                // Get holidays for current and next year
+                const currentYearHolidays = HolidayCalculator.getHolidaysForYear(currentState, currentYear);
+                console.log('Current year holidays:', currentYearHolidays);
+
+                const nextYearHolidays = HolidayCalculator.getHolidaysForYear(currentState, nextYear);
+                console.log('Next year holidays:', nextYearHolidays);
+
+                // Combine and filter future holidays
+                const allHolidays = [...currentYearHolidays, ...nextYearHolidays];
+                console.log('All holidays before filtering:', allHolidays);
+
+                const upcomingHolidays = allHolidays
+                    .filter(holiday => holiday.date >= today)
+                    .sort((a, b) => a.date - b.date)
+                    .slice(0, count);
+
+                console.log('Filtered upcoming holidays:', upcomingHolidays);
+                return upcomingHolidays;
+            } catch (error) {
+                console.error('Error getting upcoming holidays:', error);
+                console.error('Error details:', error.stack);
+                return [];
+            }
+        }
+
+        function getDaysUntilHoliday(holidayDate) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const holiday = new Date(holidayDate);
+            holiday.setHours(0, 0, 0, 0);
+
+            const diffTime = holiday - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays === 0) return "Today";
+            if (diffDays === 1) return "Tomorrow";
+            if (diffDays <= 7) return `In ${diffDays} days`;
+            if (diffDays <= 30) return `In ${diffDays} days`;
+
+            return `${Math.floor(diffDays / 30)} month${Math.floor(diffDays / 30) > 1 ? 's' : ''}`;
+        }
+
+
+        function loadUpcomingHolidays() {
+            const upcomingHolidays = getUpcomingHolidays(3);
+            const container = document.getElementById('upcomingHolidaysContainer');
+            const stateDisplay = document.getElementById('upcomingHolidaysState');
+
+            // Update state display
+            stateDisplay.textContent = systemSettings.currentState;
+
+            if (upcomingHolidays.length === 0) {
+                container.innerHTML = `
+                    <div class="col-12 text-center text-white-50">
+                        <i class="bi bi-calendar-x"></i> No upcoming holidays found
+                    </div>
+                `;
+                return;
+            }
+
+            // Create holiday cards
+            container.innerHTML = upcomingHolidays.map(holiday => {
+                const formattedDate = holiday.date.toLocaleDateString('en-AU', {
+                    weekday: 'short',
+                    day: 'numeric',
+                    month: 'short'
+                });
+                const dayOfWeek = holiday.date.toLocaleDateString('en-AU', { weekday: 'long' });
+                const daysUntil = getDaysUntilHoliday(holiday.date);
+
+                // Determine urgency class
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const diffDays = Math.ceil((holiday.date - today) / (1000 * 60 * 60 * 24));
+
+                let urgencyClass = 'bg-light';
+                let textClass = 'text-dark';
+                if (diffDays <= 1) {
+                    urgencyClass = 'bg-danger';
+                    textClass = 'text-white';
+                } else if (diffDays <= 7) {
+                    urgencyClass = 'bg-warning';
+                    textClass = 'text-dark';
+                } else if (diffDays <= 14) {
+                    urgencyClass = 'bg-info';
+                    textClass = 'text-white';
+                }
+
+                return `
+                    <div class="col-md-4 mb-2">
+                        <div class="card ${urgencyClass} border-0" style="background: rgba(255,255,255,0.9);">
+                            <div class="card-body p-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="card-title mb-1 ${textClass}" style="font-size: 0.9rem;">${holiday.name}</h6>
+                                        <p class="card-text mb-0">
+                                            <small class="${textClass}" style="opacity: 0.8;">
+                                                <i class="bi bi-calendar3"></i> ${formattedDate}
+                                            </small>
+                                        </p>
+                                        <p class="card-text mb-0">
+                                            <small class="${textClass}" style="opacity: 0.8;">
+                                                <i class="bi bi-clock"></i> ${daysUntil}
+                                            </small>
+                                        </p>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge bg-dark">${dayOfWeek}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function initializeUpcomingHolidays() {
+            loadUpcomingHolidays();
+
+            // Auto-refresh at midnight to update "days until" calculations
+            const now = new Date();
+            const tomorrow = new Date(now);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            tomorrow.setHours(0, 0, 0, 0);
+
+            const msUntilMidnight = tomorrow - now;
+
+            setTimeout(() => {
+                loadUpcomingHolidays();
+                // Then refresh every 24 hours
+                setInterval(loadUpcomingHolidays, 24 * 60 * 60 * 1000);
+            }, msUntilMidnight);
+        }
+
+        // Make functions globally available
+        window.editStaff = editStaff;
+        window.removeStaff = removeStaff;
+        window.editRoster = editRoster;
+        window.removeRoster = removeRoster;
+        window.applyShiftFilters = applyShiftFilters;
+        window.clearShiftFilters = clearShiftFilters;
+        window.changeShiftPage = changeShiftPage;
+        window.exportShiftData = exportShiftData;
+        window.updateHolidayState = updateHolidayState;
+        window.loadHolidayCalendar = loadHolidayCalendar;
+        window.checkHolidayStatus = checkHolidayStatus;
+        window.editHoliday = editHoliday;
+        window.showUpcomingHolidays = showUpcomingHolidays;
+        window.showFullYearCalendar = showFullYearCalendar;
+    </script>
+</body>
+</html>
