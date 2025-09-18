@@ -14,9 +14,315 @@ let currentShiftPage = 1;
 const shiftsPerPage = 25;
 let filteredShifts = [];
 
-// Add Staff Form Handler
+// Wizard Variables
+let currentStep = 1;
+const totalSteps = 5;
+let wizardData = {};
+
+// Wizard Navigation Functions
+function updateWizardProgress() {
+    const progress = (currentStep / totalSteps) * 100;
+    const progressBar = document.getElementById('wizardProgress');
+    const stepIndicator = document.getElementById('stepIndicator');
+    const stepCounter = document.getElementById('stepCounter');
+
+    if (progressBar) progressBar.style.width = progress + '%';
+
+    const stepNames = [
+        'Personal Information',
+        'Employment & Pay',
+        'Compliance & Banking',
+        'Documents',
+        'Review & Confirm'
+    ];
+
+    if (stepIndicator) stepIndicator.textContent = `Step ${currentStep} of ${totalSteps}: ${stepNames[currentStep - 1]}`;
+    if (stepCounter) stepCounter.textContent = `${currentStep}/${totalSteps}`;
+}
+
+function showStep(stepNumber) {
+    // Hide all steps
+    for (let i = 1; i <= totalSteps; i++) {
+        const step = document.getElementById(`step${i}`);
+        if (step) {
+            step.style.display = 'none';
+        }
+    }
+
+    // Show current step
+    const currentStepElement = document.getElementById(`step${stepNumber}`);
+    if (currentStepElement) {
+        currentStepElement.style.display = 'block';
+    }
+
+    // Update navigation buttons
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const submitBtn = document.getElementById('submitBtn');
+
+    if (prevBtn) prevBtn.style.display = stepNumber > 1 ? 'inline-block' : 'none';
+    if (nextBtn) nextBtn.style.display = stepNumber < totalSteps ? 'inline-block' : 'none';
+    if (submitBtn) submitBtn.style.display = stepNumber === totalSteps ? 'inline-block' : 'none';
+
+    console.log('Button visibility updated');
+    updateWizardProgress();
+}
+
+function validateCurrentStep() {
+    const currentStepElement = document.getElementById(`step${currentStep}`);
+    if (!currentStepElement) {
+        console.log('Step element not found:', `step${currentStep}`);
+        return true;
+    }
+
+    let isValid = true;
+
+    // Special handling for Step 1 - only validate firstName and lastName
+    if (currentStep === 1) {
+        const firstName = currentStepElement.querySelector('[name="firstName"]');
+        const lastName = currentStepElement.querySelector('[name="lastName"]');
+
+        [firstName, lastName].forEach(field => {
+            if (field) {
+                const value = field.value.trim();
+
+                if (!value) {
+                    field.classList.add('is-invalid');
+                    field.classList.remove('is-valid');
+                    isValid = false;
+
+                    // Add error message if not exists
+                    let feedback = field.parentNode.querySelector('.invalid-feedback');
+                    if (!feedback) {
+                        feedback = document.createElement('div');
+                        feedback.className = 'invalid-feedback';
+                        feedback.textContent = 'This field is required.';
+                        field.parentNode.appendChild(feedback);
+                    }
+                } else {
+                    field.classList.remove('is-invalid');
+                    field.classList.add('is-valid');
+
+                    // Remove error message
+                    const feedback = field.parentNode.querySelector('.invalid-feedback');
+                    if (feedback) {
+                        feedback.remove();
+                    }
+                }
+            }
+        });
+    } else {
+        // For other steps, validate all required fields
+        const requiredFields = currentStepElement.querySelectorAll('[required]');
+        requiredFields.forEach(field => {
+            const value = field.value.trim();
+
+            if (!value) {
+                field.classList.add('is-invalid');
+                field.classList.remove('is-valid');
+                isValid = false;
+
+                // Add error message if not exists
+                let feedback = field.parentNode.querySelector('.invalid-feedback');
+                if (!feedback) {
+                    feedback = document.createElement('div');
+                    feedback.className = 'invalid-feedback';
+                    feedback.textContent = 'This field is required.';
+                    field.parentNode.appendChild(feedback);
+                }
+            } else {
+                field.classList.remove('is-invalid');
+                field.classList.add('is-valid');
+
+                // Remove error message
+                const feedback = field.parentNode.querySelector('.invalid-feedback');
+                if (feedback) {
+                    feedback.remove();
+                }
+            }
+        });
+    }
+    return isValid;
+}
+
+function collectStepData() {
+    const form = document.getElementById('addStaffForm');
+    const formData = new FormData(form);
+
+    // Store all form data in wizardData
+    for (let [key, value] of formData.entries()) {
+        // Handle file inputs specially
+        if (value instanceof File) {
+            wizardData[key] = value.name ? value.name : null;
+        } else {
+            wizardData[key] = value;
+        }
+    }
+}
+
+function generateSummary() {
+    const summaryContent = document.getElementById('summaryContent');
+    if (!summaryContent) return;
+
+    const summary = `
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header bg-primary text-white">
+                        <h6 class="mb-0"><i class="bi bi-person"></i> Personal Information</h6>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Name:</strong> ${wizardData.firstName || ''} ${wizardData.middleName || ''} ${wizardData.lastName || ''}</p>
+                        <p><strong>DOB:</strong> ${wizardData.dob || 'Not provided'}</p>
+                        <p><strong>Gender:</strong> ${wizardData.gender || 'Not provided'}</p>
+                        <p><strong>Visa Status:</strong> ${wizardData.visaStatus || 'Not provided'}</p>
+                        <p><strong>Address:</strong> ${wizardData.streetAddress || ''}, ${wizardData.suburb || ''}, ${wizardData.state || ''} ${wizardData.postcode || ''}</p>
+                        <p><strong>Emergency Contact:</strong> ${wizardData.emergencyContactName || ''} (${wizardData.emergencyContactNumber || ''})</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header bg-info text-white">
+                        <h6 class="mb-0"><i class="bi bi-briefcase"></i> Employment</h6>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Type:</strong> ${wizardData.employmentType || 'Not provided'}</p>
+                        <p><strong>Role:</strong> ${wizardData.role || 'Not provided'}</p>
+                        <p><strong>Start Date:</strong> ${wizardData.startDate || 'Not provided'}</p>
+                        <p><strong>Award Level:</strong> ${wizardData.awardLevel || 'Not provided'}</p>
+                        <p><strong>Hours/Week:</strong> ${wizardData.defaultHoursPerWeek || 'Not provided'}</p>
+                        <p><strong>Status:</strong> ${wizardData.status || 'Active'}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header bg-success text-white">
+                        <h6 class="mb-0"><i class="bi bi-cash-coin"></i> Financial</h6>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Weekday Rate:</strong> $${wizardData.weekdayRate || '0.00'}/hr</p>
+                        <p><strong>Saturday Rate:</strong> $${wizardData.saturdayRate || '0.00'}/hr</p>
+                        <p><strong>Sunday Rate:</strong> $${wizardData.sundayRate || '0.00'}/hr</p>
+                        <p><strong>Holiday Rate:</strong> $${wizardData.publicHolidayRate || '0.00'}/hr</p>
+                        <p><strong>Overtime Rate:</strong> $${wizardData.overtimeRate || '0.00'}/hr</p>
+                        <p><strong>Pay Frequency:</strong> ${wizardData.payFrequency || 'Fortnightly'}</p>
+                        <p><strong>TFN:</strong> ${wizardData.taxRef || 'Not provided'}</p>
+                        <p><strong>Super Fund:</strong> ${wizardData.superFund || 'Not provided'}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header bg-warning text-dark">
+                        <h6 class="mb-0"><i class="bi bi-bank"></i> Banking & Integration</h6>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Account Name:</strong> ${wizardData.accountName || 'Not provided'}</p>
+                        <p><strong>BSB:</strong> ${wizardData.bsb || 'Not provided'}</p>
+                        <p><strong>Account Number:</strong> ${wizardData.accountNumber || 'Not provided'}</p>
+                        <p><strong>Bank:</strong> ${wizardData.bankName || 'Not provided'}</p>
+                        <p><strong>Payroll Ref:</strong> ${wizardData.payrollRef || 'Not provided'}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header bg-secondary text-white">
+                        <h6 class="mb-0"><i class="bi bi-file-earmark-text"></i> Documents</h6>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Profile Picture:</strong> ${wizardData.profilePic ? '✅ Uploaded' : '❌ Not uploaded'}</p>
+                        <p><strong>Employment Contract:</strong> ${wizardData.employmentContract ? '✅ Uploaded' : '❌ Not uploaded'}</p>
+                        <p><strong>Tax Declaration:</strong> ${wizardData.taxDeclaration ? '✅ Uploaded' : '❌ Not uploaded'}</p>
+                        <p><strong>Bank Details:</strong> ${wizardData.bankDetails ? '✅ Uploaded' : '❌ Not uploaded'}</p>
+                        <p><strong>Other Documents:</strong> ${wizardData.otherDocuments ? '✅ Uploaded' : '❌ Not uploaded'}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="alert alert-info mt-4">
+            <i class="bi bi-info-circle me-2"></i>
+            <strong>Ready to Create:</strong> Please review all information above. Click "Create Staff Member" to add this person to your system.
+        </div>
+    `;
+
+    summaryContent.innerHTML = summary;
+}
+
+// Wizard Navigation Event Listeners
+document.addEventListener('DOMContentLoaded', function() {
+    const nextBtn = document.getElementById('nextBtn');
+    const prevBtn = document.getElementById('prevBtn');
+
+    if (nextBtn) {
+        nextBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const isValid = validateCurrentStep();
+
+            if (isValid) {
+                collectStepData();
+                if (currentStep < totalSteps) {
+                    currentStep++;
+                    showStep(currentStep);
+                    if (currentStep === totalSteps) {
+                        generateSummary();
+                    }
+                }
+            }
+        });
+    }
+
+    if (prevBtn) {
+        prevBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (currentStep > 1) {
+                currentStep--;
+                showStep(currentStep);
+            }
+        });
+    }
+
+    // Reset wizard when modal is opened
+    const addStaffModal = document.getElementById('addStaffModal');
+    if (addStaffModal) {
+        addStaffModal.addEventListener('show.bs.modal', function() {
+            currentStep = 1;
+            wizardData = {};
+
+            // Clear any previous validation states
+            const form = document.getElementById('addStaffForm');
+            if (form) {
+                form.reset();
+                const invalidFields = form.querySelectorAll('.is-invalid');
+                invalidFields.forEach(field => {
+                    field.classList.remove('is-invalid');
+                    field.classList.remove('is-valid');
+                });
+                const feedbacks = form.querySelectorAll('.invalid-feedback');
+                feedbacks.forEach(feedback => feedback.remove());
+            }
+
+            showStep(1);
+            console.log('Wizard reset complete');
+        });
+    }
+
+});
+
+// Add Staff Form Handler - Only handle submission on final step
 document.getElementById('addStaffForm').addEventListener('submit', function(e) {
     e.preventDefault();
+
+    // Only process form submission if we're on the final step
+    if (currentStep !== totalSteps) {
+        return;
+    }
     const formData = new FormData(this);
 
     const staff = {
@@ -40,19 +346,36 @@ document.getElementById('addStaffForm').addEventListener('submit', function(e) {
         startDate: formData.get('startDate'),
         role: formData.get('role'),
         status: formData.get('status') || 'active',
+        // Employment Classification
+        employmentType: formData.get('employmentType'),
+        awardLevel: formData.get('awardLevel') || '',
+        defaultHoursPerWeek: parseFloat(formData.get('defaultHoursPerWeek')) || 0,
         // Pay Rates
         weekdayRate: parseFloat(formData.get('weekdayRate')) || 0,
         saturdayRate: parseFloat(formData.get('saturdayRate')) || 0,
         sundayRate: parseFloat(formData.get('sundayRate')) || 0,
         publicHolidayRate: parseFloat(formData.get('publicHolidayRate')) || 0,
+        overtimeRate: parseFloat(formData.get('overtimeRate')) || 0,
+        payFrequency: formData.get('payFrequency') || 'fortnightly',
+        // Tax & Compliance
+        taxRef: formData.get('taxRef') || '',
+        superFund: formData.get('superFund') || '',
+        superMemberId: formData.get('superMemberId') || '',
+        // System Integration
+        payrollRef: formData.get('payrollRef') || '',
         // Bank Details
         accountName: formData.get('accountName') || '',
         bsb: formData.get('bsb') || '',
         accountNumber: formData.get('accountNumber') || '',
         bankName: formData.get('bankName') || '',
+        // Documents (store file names for now)
+        profilePic: formData.get('profilePic') ? formData.get('profilePic').name : '',
+        employmentContract: formData.get('employmentContract') ? formData.get('employmentContract').name : '',
+        taxDeclaration: formData.get('taxDeclaration') ? formData.get('taxDeclaration').name : '',
+        bankDetails: formData.get('bankDetails') ? formData.get('bankDetails').name : '',
+        otherDocuments: formData.get('otherDocuments') ? formData.get('otherDocuments').name : '',
         // Legacy field for compatibility
         hourlyRate: parseFloat(formData.get('weekdayRate')) || 0,
-        profilePic: '', // File handling would need backend
         createdAt: new Date().toISOString()
     };
 
@@ -73,37 +396,15 @@ document.getElementById('editStaffForm').addEventListener('submit', function(e) 
 
     const staffIndex = staffMembers.findIndex(s => s.id === staffId);
     if (staffIndex !== -1) {
+        // Only update the essential fields that are in the simplified edit form
         staffMembers[staffIndex] = {
             ...staffMembers[staffIndex],
             firstName: formData.get('firstName'),
-            middleName: formData.get('middleName') || '',
             lastName: formData.get('lastName'),
-            dob: formData.get('dob'),
-            gender: formData.get('gender'),
-            visaStatus: formData.get('visaStatus'),
-            // Address Information
-            streetAddress: formData.get('streetAddress') || '',
-            suburb: formData.get('suburb') || '',
-            state: formData.get('state') || '',
-            postcode: formData.get('postcode') || '',
-            country: formData.get('country') || '',
-            // Emergency Contact
-            emergencyContactName: formData.get('emergencyContactName') || '',
-            emergencyContactNumber: formData.get('emergencyContactNumber') || '',
-            // Employment Information
-            startDate: formData.get('startDate'),
             role: formData.get('role'),
             status: formData.get('status') || 'active',
-            // Pay Rates
+            visaStatus: formData.get('visaStatus'),
             weekdayRate: parseFloat(formData.get('weekdayRate')) || 0,
-            saturdayRate: parseFloat(formData.get('saturdayRate')) || 0,
-            sundayRate: parseFloat(formData.get('sundayRate')) || 0,
-            publicHolidayRate: parseFloat(formData.get('publicHolidayRate')) || 0,
-            // Bank Details
-            accountName: formData.get('accountName') || '',
-            bsb: formData.get('bsb') || '',
-            accountNumber: formData.get('accountNumber') || '',
-            bankName: formData.get('bankName') || '',
             // Legacy field for compatibility
             hourlyRate: parseFloat(formData.get('weekdayRate')) || 0
         };
@@ -121,41 +422,13 @@ function editStaff(staffId) {
     const form = document.getElementById('editStaffForm');
     form.staffId.value = staff.id;
 
-    // Personal Information
+    // Essential fields only
     form.firstName.value = staff.firstName || '';
-    form.middleName.value = staff.middleName || '';
     form.lastName.value = staff.lastName || '';
-    form.dob.value = staff.dob || '';
-    form.gender.value = staff.gender || '';
-    form.visaStatus.value = staff.visaStatus || '';
-
-    // Address Information
-    form.streetAddress.value = staff.streetAddress || '';
-    form.suburb.value = staff.suburb || '';
-    form.state.value = staff.state || '';
-    form.postcode.value = staff.postcode || '';
-    form.country.value = staff.country || '';
-
-    // Emergency Contact
-    form.emergencyContactName.value = staff.emergencyContactName || '';
-    form.emergencyContactNumber.value = staff.emergencyContactNumber || '';
-
-    // Employment Information
-    form.startDate.value = staff.startDate || '';
     form.role.value = staff.role || '';
-    form.status.value = staff.status || 'active';
-
-    // Pay Rates (fallback to legacy hourlyRate if new rates don't exist)
     form.weekdayRate.value = staff.weekdayRate || staff.hourlyRate || '';
-    form.saturdayRate.value = staff.saturdayRate || '';
-    form.sundayRate.value = staff.sundayRate || '';
-    form.publicHolidayRate.value = staff.publicHolidayRate || '';
-
-    // Bank Details
-    form.accountName.value = staff.accountName || '';
-    form.bsb.value = staff.bsb || '';
-    form.accountNumber.value = staff.accountNumber || '';
-    form.bankName.value = staff.bankName || '';
+    form.status.value = staff.status || 'active';
+    form.visaStatus.value = staff.visaStatus || '';
 
     new bootstrap.Modal(document.getElementById('editStaffModal')).show();
 }
@@ -1218,97 +1491,6 @@ function getDaysUntilHoliday(holidayDate) {
     return `${Math.floor(diffDays / 30)} month${Math.floor(diffDays / 30) > 1 ? 's' : ''}`;
 }
 
-function loadUpcomingHolidays() {
-    const upcomingHolidays = getUpcomingHolidays(3);
-    const container = document.getElementById('upcomingHolidaysContainer');
-    const stateDisplay = document.getElementById('upcomingHolidaysState');
-
-    // Update state display
-    stateDisplay.textContent = systemSettings.currentState;
-
-    if (upcomingHolidays.length === 0) {
-        container.innerHTML = `
-            <div class="col-12 text-center text-white-50">
-                <i class="bi bi-calendar-x"></i> No upcoming holidays found
-            </div>
-        `;
-        return;
-    }
-
-    // Create holiday cards
-    container.innerHTML = upcomingHolidays.map(holiday => {
-        const formattedDate = holiday.date.toLocaleDateString('en-AU', {
-            weekday: 'short',
-            day: 'numeric',
-            month: 'short'
-        });
-        const dayOfWeek = holiday.date.toLocaleDateString('en-AU', { weekday: 'long' });
-        const daysUntil = getDaysUntilHoliday(holiday.date);
-
-        // Determine urgency class
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const diffDays = Math.ceil((holiday.date - today) / (1000 * 60 * 60 * 24));
-
-        let urgencyClass = 'bg-light';
-        let textClass = 'text-dark';
-        if (diffDays <= 1) {
-            urgencyClass = 'bg-danger';
-            textClass = 'text-white';
-        } else if (diffDays <= 7) {
-            urgencyClass = 'bg-warning';
-            textClass = 'text-dark';
-        } else if (diffDays <= 14) {
-            urgencyClass = 'bg-info';
-            textClass = 'text-white';
-        }
-
-        return `
-            <div class="col-md-4 mb-2">
-                <div class="card ${urgencyClass} border-0" style="background: rgba(255,255,255,0.9);">
-                    <div class="card-body p-3">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-title mb-1 ${textClass}" style="font-size: 0.9rem;">${holiday.name}</h6>
-                                <p class="card-text mb-0">
-                                    <small class="${textClass}" style="opacity: 0.8;">
-                                        <i class="bi bi-calendar3"></i> ${formattedDate}
-                                    </small>
-                                </p>
-                                <p class="card-text mb-0">
-                                    <small class="${textClass}" style="opacity: 0.8;">
-                                        <i class="bi bi-clock"></i> ${daysUntil}
-                                    </small>
-                                </p>
-                            </div>
-                            <div class="text-end">
-                                <span class="badge bg-dark">${dayOfWeek}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-    }).join('');
-}
-
-function initializeUpcomingHolidays() {
-    loadUpcomingHolidays();
-
-    // Auto-refresh at midnight to update "days until" calculations
-    const now = new Date();
-    const tomorrow = new Date(now);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(0, 0, 0, 0);
-
-    const msUntilMidnight = tomorrow - now;
-
-    setTimeout(() => {
-        loadUpcomingHolidays();
-        // Then refresh every 24 hours
-        setInterval(loadUpcomingHolidays, 24 * 60 * 60 * 1000);
-    }, msUntilMidnight);
-}
 
 // Make functions globally available
 window.editStaff = editStaff;

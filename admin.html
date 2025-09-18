@@ -392,17 +392,29 @@
         </div>
     </div>
 
-    <!-- Add Staff Modal -->
-    <div class="modal fade" id="addStaffModal" tabindex="-1" aria-hidden="true">
+    <!-- Add Staff Wizard Modal -->
+    <div class="modal fade" id="addStaffModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-modal-type="add">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <form id="addStaffForm">
                     <div class="modal-header">
-                        <h5 class="modal-title">Add New Staff</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        <div class="flex-fill">
+                            <h5 class="modal-title">Add New Staff Member</h5>
+                            <!-- Progress Indicator -->
+                            <div class="progress mt-2" style="height: 6px;">
+                                <div class="progress-bar progress-bar-striped" role="progressbar" style="width: 20%" id="wizardProgress"></div>
+                            </div>
+                            <div class="d-flex justify-content-between mt-2">
+                                <small class="text-muted" id="stepIndicator">Step 1 of 5: Personal Information</small>
+                                <small class="text-muted" id="stepCounter">1/5</small>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-close ms-2" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body">
-                        <!-- Personal Information Section -->
+                    <div class="modal-body" style="min-height: 400px;">
+                       
+                        <!-- Step 1: Personal Information -->
+                        <div class="wizard-step" id="step1" style="display: block;">
                         <h6 class="text-primary mb-3"><i class="bi bi-person"></i> Personal Information</h6>
                         <div class="row g-3">
                             <div class="col-md-4">
@@ -490,6 +502,10 @@
                                 <input type="tel" class="form-control" name="emergencyContactNumber" placeholder="e.g. 0400 123 456">
                             </div>
                         </div>
+                        </div>
+
+                        <!-- Step 2: Employment & Pay -->
+                        <div class="wizard-step" id="step2" style="display: none;">
 
                         <!-- Employment Information Section -->
                         <h6 class="text-primary mb-3 mt-4"><i class="bi bi-briefcase"></i> Employment Information</h6>
@@ -511,24 +527,92 @@
                             </div>
                         </div>
 
+                        <!-- Employment Classification Section -->
+                        <h6 class="text-primary mb-3 mt-4"><i class="bi bi-person-badge"></i> Employment Classification</h6>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Employment Type <span class="text-danger">*</span></label>
+                                <select class="form-select" name="employmentType" required>
+                                    <option value="">Select Type</option>
+                                    <option value="casual">Casual</option>
+                                    <option value="part-time">Part-Time</option>
+                                    <option value="full-time">Full-Time</option>
+                                    <option value="contractor">Contractor</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Award Level</label>
+                                <input type="text" class="form-control" name="awardLevel" placeholder="e.g., Level 1, Supervisor">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Default Hours/Week</label>
+                                <input type="number" class="form-control" name="defaultHoursPerWeek" step="0.5" min="0" max="80" placeholder="38">
+                            </div>
+                        </div>
+
                         <!-- Pay Rates Section -->
                         <h6 class="text-primary mb-3 mt-4"><i class="bi bi-cash-coin"></i> Pay Rates (per hour)</h6>
                         <div class="row g-3">
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label class="form-label">Weekday Rate ($)</label>
-                                <input type="number" step="0.01" class="form-control" name="weekdayRate" placeholder="e.g. 25.00">
+                                <input type="number" step="0.01" class="form-control" name="weekdayRate" placeholder="25.00">
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label class="form-label">Saturday Rate ($)</label>
-                                <input type="number" step="0.01" class="form-control" name="saturdayRate" placeholder="e.g. 30.00">
+                                <input type="number" step="0.01" class="form-control" name="saturdayRate" placeholder="30.00">
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label class="form-label">Sunday Rate ($)</label>
-                                <input type="number" step="0.01" class="form-control" name="sundayRate" placeholder="e.g. 35.00">
+                                <input type="number" step="0.01" class="form-control" name="sundayRate" placeholder="35.00">
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label class="form-label">Public Holiday Rate ($)</label>
-                                <input type="number" step="0.01" class="form-control" name="publicHolidayRate" placeholder="e.g. 50.00">
+                                <input type="number" step="0.01" class="form-control" name="publicHolidayRate" placeholder="50.00">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Overtime Rate ($)</label>
+                                <input type="number" step="0.01" class="form-control" name="overtimeRate" placeholder="37.50">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Pay Frequency</label>
+                                <select class="form-select" name="payFrequency">
+                                    <option value="weekly">Weekly</option>
+                                    <option value="fortnightly" selected>Fortnightly</option>
+                                    <option value="monthly">Monthly</option>
+                                </select>
+                            </div>
+                        </div>
+                        </div>
+
+                        <!-- Step 3: Compliance & Banking -->
+                        <div class="wizard-step" id="step3" style="display: none;">
+
+                        <!-- Tax & Compliance Section -->
+                        <h6 class="text-primary mb-3 mt-4"><i class="bi bi-shield-check"></i> Tax & Compliance</h6>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Tax File Number (TFN)</label>
+                                <input type="text" class="form-control" name="taxRef" pattern="[0-9]{9}" placeholder="123456789" maxlength="9">
+                                <small class="form-text text-muted">Required for employees (9 digits)</small>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Superannuation Fund</label>
+                                <input type="text" class="form-control" name="superFund" placeholder="e.g., AustralianSuper">
+                                <small class="form-text text-muted">Required for employees</small>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Super Member ID</label>
+                                <input type="text" class="form-control" name="superMemberId" placeholder="Member number">
+                            </div>
+                        </div>
+
+                        <!-- System Integration Section -->
+                        <h6 class="text-primary mb-3 mt-4"><i class="bi bi-link-45deg"></i> System Integration</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Payroll Reference ID</label>
+                                <input type="text" class="form-control" name="payrollRef" placeholder="External payroll system ID (Xero, MYOB, etc.)">
+                                <small class="form-text text-muted">Optional - for external payroll system integration</small>
                             </div>
                         </div>
 
@@ -552,6 +636,10 @@
                                 <input type="text" class="form-control" name="bankName" placeholder="e.g. Commonwealth Bank">
                             </div>
                         </div>
+                        </div>
+
+                        <!-- Step 4: Documents -->
+                        <div class="wizard-step" id="step4" style="display: none;">
 
                         <!-- Profile Picture Section -->
                         <h6 class="text-primary mb-3 mt-4"><i class="bi bi-image"></i> Profile Picture</h6>
@@ -559,12 +647,59 @@
                             <div class="col-md-12">
                                 <label class="form-label">Profile Picture</label>
                                 <input type="file" class="form-control" name="profilePic" accept="image/*">
+                                <small class="form-text text-muted">Upload a professional photo (JPG, PNG, max 5MB)</small>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+                        <h6 class="text-primary mb-3"><i class="bi bi-file-earmark-text"></i> Employment Documents</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Employment Contract</label>
+                                <input type="file" class="form-control" name="employmentContract" accept=".pdf,.doc,.docx">
+                                <small class="form-text text-muted">Upload signed employment contract (PDF, Word)</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Tax Declaration Form</label>
+                                <input type="file" class="form-control" name="taxDeclaration" accept=".pdf,.doc,.docx">
+                                <small class="form-text text-muted">Tax File Number declaration form</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Bank Account Details</label>
+                                <input type="file" class="form-control" name="bankDetails" accept=".pdf,.jpg,.jpeg,.png">
+                                <small class="form-text text-muted">Bank statement or account details document</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Other Documents</label>
+                                <input type="file" class="form-control" name="otherDocuments" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" multiple>
+                                <small class="form-text text-muted">Any additional employment-related documents</small>
+                            </div>
+                        </div>
+                        </div>
+
+                        <!-- Step 5: Summary & Confirmation -->
+                        <div class="wizard-step" id="step5" style="display: none;">
+
+                            <div id="summaryContent">
+                                <!-- Summary content will be dynamically generated -->
                             </div>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-success">Save</button>
+                    <div class="modal-footer d-flex justify-content-between">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="bi bi-x-lg"></i> Cancel
+                        </button>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-outline-primary" id="prevBtn" style="display: none;">
+                                <i class="bi bi-arrow-left"></i> Previous
+                            </button>
+                            <button type="button" class="btn btn-primary" id="nextBtn">
+                                Next <i class="bi bi-arrow-right"></i>
+                            </button>
+                            <button type="submit" class="btn btn-success" id="submitBtn" style="display: none;">
+                                <i class="bi bi-check-lg"></i> Create Staff Member
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -583,32 +718,29 @@
                     <div class="modal-body">
                         <input type="hidden" name="staffId">
 
-                        <!-- Personal Information Section -->
-                        <h6 class="text-primary mb-3"><i class="bi bi-person"></i> Personal Information</h6>
+                        <!-- Essential Fields Only for Quick Editing -->
                         <div class="row g-3">
                             <div class="col-md-4">
                                 <label class="form-label">First Name</label>
                                 <input type="text" class="form-control" name="firstName" required>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Middle Name</label>
-                                <input type="text" class="form-control" name="middleName">
-                            </div>
-                            <div class="col-md-4">
                                 <label class="form-label">Last Name</label>
                                 <input type="text" class="form-control" name="lastName" required>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Date of Birth</label>
-                                <input type="date" class="form-control" name="dob">
+                                <label class="form-label">Role</label>
+                                <input type="text" class="form-control" name="role">
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Gender</label>
-                                <select class="form-select" name="gender">
-                                    <option value="">Select Gender</option>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                    <option value="Other">Other</option>
+                                <label class="form-label">Weekday Rate ($)</label>
+                                <input type="number" step="0.01" class="form-control" name="weekdayRate">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Status</label>
+                                <select class="form-select" name="status">
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
                                 </select>
                             </div>
                             <div class="col-md-4">
@@ -624,123 +756,11 @@
                             </div>
                         </div>
 
-                        <!-- Address Information Section -->
-                        <h6 class="text-primary mb-3 mt-4"><i class="bi bi-house"></i> Address Information</h6>
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Street Address</label>
-                                <input type="text" class="form-control" name="streetAddress">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Suburb</label>
-                                <input type="text" class="form-control" name="suburb">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">State</label>
-                                <select class="form-select" name="state">
-                                    <option value="">Select State</option>
-                                    <option value="NSW">NSW</option>
-                                    <option value="VIC">VIC</option>
-                                    <option value="QLD">QLD</option>
-                                    <option value="WA">WA</option>
-                                    <option value="SA">SA</option>
-                                    <option value="TAS">TAS</option>
-                                    <option value="ACT">ACT</option>
-                                    <option value="NT">NT</option>
-                                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Postcode</label>
-                                <input type="text" class="form-control" name="postcode">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Country</label>
-                                <input type="text" class="form-control" name="country">
-                            </div>
-                        </div>
-
-                        <!-- Emergency Contact Section -->
-                        <h6 class="text-primary mb-3 mt-4"><i class="bi bi-telephone"></i> Emergency Contact</h6>
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Emergency Contact Name</label>
-                                <input type="text" class="form-control" name="emergencyContactName">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Emergency Contact Number</label>
-                                <input type="tel" class="form-control" name="emergencyContactNumber">
-                            </div>
-                        </div>
-
-                        <!-- Employment Information Section -->
-                        <h6 class="text-primary mb-3 mt-4"><i class="bi bi-briefcase"></i> Employment Information</h6>
-                        <div class="row g-3">
-                            <div class="col-md-4">
-                                <label class="form-label">Start Date</label>
-                                <input type="date" class="form-control" name="startDate">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Role</label>
-                                <input type="text" class="form-control" name="role">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Status</label>
-                                <select class="form-select" name="status">
-                                    <option value="active">Active</option>
-                                    <option value="inactive">Inactive</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- Pay Rates Section -->
-                        <h6 class="text-primary mb-3 mt-4"><i class="bi bi-cash-coin"></i> Pay Rates (per hour)</h6>
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Weekday Rate ($)</label>
-                                <input type="number" step="0.01" class="form-control" name="weekdayRate">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Saturday Rate ($)</label>
-                                <input type="number" step="0.01" class="form-control" name="saturdayRate">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Sunday Rate ($)</label>
-                                <input type="number" step="0.01" class="form-control" name="sundayRate">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Public Holiday Rate ($)</label>
-                                <input type="number" step="0.01" class="form-control" name="publicHolidayRate">
-                            </div>
-                        </div>
-
-                        <!-- Bank Details Section -->
-                        <h6 class="text-primary mb-3 mt-4"><i class="bi bi-bank"></i> Bank Details</h6>
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Account Name</label>
-                                <input type="text" class="form-control" name="accountName">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">BSB</label>
-                                <input type="text" class="form-control" name="bsb">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Account Number</label>
-                                <input type="text" class="form-control" name="accountNumber">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Bank Name</label>
-                                <input type="text" class="form-control" name="bankName">
-                            </div>
-                        </div>
-
-                        <!-- Profile Picture Section -->
-                        <h6 class="text-primary mb-3 mt-4"><i class="bi bi-image"></i> Profile Picture</h6>
-                        <div class="row g-3">
-                            <div class="col-md-12">
-                                <label class="form-label">Profile Picture</label>
-                                <input type="file" class="form-control" name="profilePic" accept="image/*">
-                            </div>
+                        <div class="mt-3">
+                            <p class="text-muted small">
+                                <i class="bi bi-info-circle"></i>
+                                For detailed information editing, please delete and re-add the staff member using the full wizard.
+                            </p>
                         </div>
                     </div>
                     <div class="modal-footer">
