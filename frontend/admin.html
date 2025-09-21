@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Staff Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <div class="container-fluid">
+        <!-- Enhanced Header with Navigation -->
+        <nav class="navbar navbar-expand-lg navbar-dark mb-4" style="background: rgba(45, 45, 68, 0.95); backdrop-filter: blur(10px);">
+            <div class="container">
+                <a class="navbar-brand d-flex align-items-center" href="#">
+                    <i class="bi bi-gear-fill me-2 fs-3"></i>
+                    <span class="fw-bold">Admin Panel</span>
+                </a>
+
+                <div class="d-flex">
+                    <button class="btn btn-outline-light btn-sm" onclick="logout()">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container">
+
+            <!-- Staff Management Section -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-people me-2"></i>
+                        Staff Management
+                    </h5>
+                    <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#addStaffModal">
+                        <i class="bi bi-person-plus me-2"></i>
+                        Add New Staff
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th><i class="bi bi-person me-2"></i>Name</th>
+                                    <th><i class="bi bi-briefcase me-2"></i>Role</th>
+                                    <th><i class="bi bi-calendar me-2"></i>Start Date</th>
+                                    <th><i class="bi bi-passport me-2"></i>Visa Status</th>
+                                    <th><i class="bi bi-check-circle me-2"></i>Status</th>
+                                    <th><i class="bi bi-gear me-2"></i>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="staffTableBody">
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted py-5">
+                                        <i class="bi bi-person-plus display-1 mb-3"></i>
+                                        <div class="h5">No staff members added yet</div>
+                                        <p class="mb-3">Get started by adding your first staff member</p>
+                                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addStaffModal">
+                                            <i class="bi bi-person-plus me-2"></i>
+                                            Add Staff Member
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        <div class="section">
+            <h2>Staff Rostering</h2>
+            <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#addRosterModal">
+                <i class="bi bi-calendar-plus"></i>
+                Create New Roster
+            </button>
+
+            <!-- Roster Table -->
+            <div class="table-container">
+                <table class="table table-bordered table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Date</th>
+                        <th>Job Description</th>
+                        <th>Staff Assigned</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="rosterTableBody">
+                    <tr>
+                        <td colspan="7" class="text-center text-muted fst-italic py-4">No rosters created yet.</td>
+                    </tr>
+                </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Today's Shifts</h2>
+            <table class="shifts-table">
+                <thead>
+                    <tr>
+                        <th>Staff Name</th>
+                        <th>Clock In</th>
+                        <th>Clock Out</th>
+                        <th>Duration</th>
+                        <th>Day Type</th>
+                        <th>Pay Rate</th>
+                        <th>Total Pay</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="shiftsTableBody">
+                    <tr>
+                        <td colspan="8" class="no-data">No shifts recorded for today.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2><i class="bi bi-calendar-event"></i> Public Holiday Management</h2>
+
+            <!-- Holiday Settings Card -->
+            <div class="card mb-4" style="background: #3a3a56; border: 1px solid #4a4a68;">
+                <div class="card-header" style="background: #2a2a3e; border-bottom: 1px solid #4a4a68;">
+                    <h5 class="card-title mb-0" style="color: #ffffff;">
+                        <i class="bi bi-gear"></i> Holiday Settings
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label for="holidayState" class="form-label">Current State</label>
+                            <select class="form-select" id="holidayState" onchange="updateHolidayState()">
+                                <option value="TAS">Tasmania</option>
+                                <option value="NSW">New South Wales</option>
+                                <option value="VIC">Victoria</option>
+                                <option value="QLD">Queensland</option>
+                                <option value="WA">Western Australia</option>
+                                <option value="SA">South Australia</option>
+                                <option value="ACT">Australian Capital Territory</option>
+                                <option value="NT">Northern Territory</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="holidayYear" class="form-label">View Year</label>
+                            <select class="form-select" id="holidayYear" onchange="loadHolidayCalendar()">
+                                <option value="2025">2025</option>
+                                <option value="2026">2026</option>
+                                <option value="2027">2027</option>
+                                <option value="2028">2028</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-primary mt-4" onclick="loadHolidayCalendar()">
+                                <i class="bi bi-arrow-clockwise"></i> Refresh Calendar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Holiday Calendar Display -->
+            <div class="card mb-4" style="background: #3a3a56; border: 1px solid #4a4a68;">
+                <div class="card-header" style="background: #2a2a3e; border-bottom: 1px solid #4a4a68;">
+                    <h5 class="card-title mb-0" style="color: #ffffff;">
+                        <i class="bi bi-calendar-check"></i> <span id="holidayCalendarTitle">Upcoming Holidays</span> <span id="holidayCalendarYear"></span>
+                    </h5>
+                    <div class="mt-2">
+                        <button class="btn btn-sm btn-outline-light" onclick="showUpcomingHolidays()">
+                            <i class="bi bi-clock"></i> Upcoming (3)
+                        </button>
+                        <button class="btn btn-sm btn-outline-light ms-2" onclick="showFullYearCalendar()">
+                            <i class="bi bi-calendar3"></i> Full Year
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-container">
+                        <table class="table table-bordered table-striped">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Holiday Name</th>
+                                    <th>Days Until</th>
+                                    <th>Day of Week</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="holidayCalendarBody">
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted fst-italic py-4">Loading holiday calendar...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Holiday Test Tool -->
+            <div class="card mb-4" style="background: #3a3a56; border: 1px solid #4a4a68;">
+                <div class="card-header" style="background: #2a2a3e; border-bottom: 1px solid #4a4a68;">
+                    <h5 class="card-title mb-0" style="color: #ffffff;">
+                        <i class="bi bi-search"></i> Holiday Checker Tool
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label for="checkDate" class="form-label">Check Date</label>
+                            <input type="date" class="form-control" id="checkDate" value="">
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-info mt-4" onclick="checkHolidayStatus()">
+                                <i class="bi bi-calendar-check"></i> Check Holiday
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mt-4">
+                                <div id="holidayCheckResult" class="alert alert-info d-none" role="alert">
+                                    <!-- Result will appear here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><i class="bi bi-calendar3"></i> Shift History & Analytics</h2>
+
+            <!-- Enhanced Date Range Filter -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-funnel me-2"></i>Filter Shifts
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label for="filterFromDate" class="form-label fw-semibold">From Date</label>
+                            <input type="date" class="form-control" id="filterFromDate">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="filterToDate" class="form-label fw-semibold">To Date</label>
+                            <input type="date" class="form-control" id="filterToDate">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="filterStaff" class="form-label fw-semibold">Staff Member</label>
+                            <select class="form-select" id="filterStaff">
+                                <option value="">All Staff</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="filterStatus" class="form-label fw-semibold">Status</label>
+                            <select class="form-select" id="filterStatus">
+                                <option value="">All Statuses</option>
+                                <option value="completed">Completed</option>
+                                <option value="active">Currently Active</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-primary" onclick="applyShiftFilters()">
+                                    <i class="bi bi-search me-1"></i>Apply Filters
+                                </button>
+                                <button class="btn btn-outline-secondary" onclick="clearShiftFilters()">
+                                    <i class="bi bi-x-circle me-1"></i>Clear
+                                </button>
+                                <button class="btn btn-success" onclick="exportShiftData()">
+                                    <i class="bi bi-download me-1"></i>Export CSV
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enhanced Shift Analytics Summary -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-2">
+                    <div class="card bg-primary bg-gradient text-white text-center h-100">
+                        <div class="card-body d-flex flex-column justify-content-center">
+                            <h3 class="card-title mb-0" id="totalShiftsCount">0</h3>
+                            <p class="card-text opacity-75 mb-0 small">Total Shifts</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card bg-success bg-gradient text-white text-center h-100">
+                        <div class="card-body d-flex flex-column justify-content-center">
+                            <h3 class="card-title mb-0" id="totalHoursWorked">0h</h3>
+                            <p class="card-text opacity-75 mb-0 small">Total Hours</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card bg-info bg-gradient text-white text-center h-100">
+                        <div class="card-body d-flex flex-column justify-content-center">
+                            <h3 class="card-title mb-0" id="avgShiftLength">0h</h3>
+                            <p class="card-text opacity-75 mb-0 small">Avg Shift Length</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card bg-danger bg-gradient text-white text-center h-100">
+                        <div class="card-body d-flex flex-column justify-content-center">
+                            <h3 class="card-title mb-0" id="totalPayroll">$0</h3>
+                            <p class="card-text opacity-75 mb-0 small">Total Payroll</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card bg-secondary bg-gradient text-white text-center h-100">
+                        <div class="card-body d-flex flex-column justify-content-center">
+                            <h3 class="card-title mb-0" id="avgHourlyRate">$0</h3>
+                            <p class="card-text opacity-75 mb-0 small">Avg Hourly Rate</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card bg-warning bg-gradient text-dark text-center h-100">
+                        <div class="card-body d-flex flex-column justify-content-center">
+                            <h3 class="card-title mb-0" id="activeShiftsCount">0</h3>
+                            <p class="card-text opacity-75 mb-0 small">Active Shifts</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enhanced Shift History Table -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-table me-2"></i>Shift History
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th scope="col">Date</th>
+                                    <th scope="col">Staff Name</th>
+                                    <th scope="col">Role</th>
+                                    <th scope="col">Clock In</th>
+                                    <th scope="col">Clock Out</th>
+                                    <th scope="col">Duration</th>
+                                    <th scope="col">Day Type</th>
+                                    <th scope="col">Pay Rate</th>
+                                    <th scope="col">Total Pay</th>
+                                </tr>
+                            </thead>
+                            <tbody id="shiftHistoryTableBody">
+                                <tr>
+                                    <td colspan="9" class="text-center text-muted py-5">
+                                        <i class="bi bi-clock-history display-1 text-muted mb-3 d-block"></i>
+                                        <h5 class="text-muted">No shift history available</h5>
+                                        <p class="text-muted mb-0">Shift history will appear here once staff start clocking in/out.</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <div>
+                    <span class="text-muted">Showing <span id="shiftResultsInfo">0 results</span></span>
+                </div>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0" id="shiftPagination">
+                        <!-- Pagination will be generated here -->
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Staff Wizard Modal -->
+    <div class="modal fade" id="addStaffModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-modal-type="add">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form id="addStaffForm">
+                    <div class="modal-header">
+                        <div class="flex-fill">
+                            <h5 class="modal-title">Add New Staff Member</h5>
+                            <!-- Progress Indicator -->
+                            <div class="progress mt-2" style="height: 6px;">
+                                <div class="progress-bar progress-bar-striped" role="progressbar" style="width: 20%" id="wizardProgress"></div>
+                            </div>
+                            <div class="d-flex justify-content-between mt-2">
+                                <small class="text-muted" id="stepIndicator">Step 1 of 5: Personal Information</small>
+                                <small class="text-muted" id="stepCounter">1/5</small>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-close ms-2" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" style="min-height: 400px;">
+                       
+                        <!-- Step 1: Personal Information -->
+                        <div class="wizard-step" id="step1" style="display: block;">
+                        <h6 class="text-primary mb-3"><i class="bi bi-person"></i> Personal Information</h6>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="firstName" class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="firstName" name="firstName" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="middleName" class="form-label">Middle Name</label>
+                                <input type="text" class="form-control" id="middleName" name="middleName">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="lastName" class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="lastName" name="lastName" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="dob" class="form-label">Date of Birth</label>
+                                <input type="date" class="form-control" id="dob" name="dob">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="gender" class="form-label">Gender</label>
+                                <select class="form-select" id="gender" name="gender">
+                                    <option value="">Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="visaStatus" class="form-label">Visa Status</label>
+                                <select class="form-select" id="visaStatus" name="visaStatus">
+                                    <option value="">Select Visa Status</option>
+                                    <option value="Citizen">Citizen</option>
+                                    <option value="PR">PR</option>
+                                    <option value="Work Visa">Work Visa</option>
+                                    <option value="Student Visa">Student Visa</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Address Information Section -->
+                        <h6 class="text-primary mb-3 mt-4"><i class="bi bi-house"></i> Address Information</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="streetAddress" class="form-label">Street Address</label>
+                                <input type="text" class="form-control" id="streetAddress" name="streetAddress" placeholder="e.g. 123 Main Street">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="suburb" class="form-label">Suburb</label>
+                                <input type="text" class="form-control" id="suburb" name="suburb" placeholder="e.g. Sydney CBD">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="state" class="form-label">State</label>
+                                <select class="form-select" id="state" name="state">
+                                    <option value="">Select State</option>
+                                    <option value="NSW">NSW</option>
+                                    <option value="VIC">VIC</option>
+                                    <option value="QLD">QLD</option>
+                                    <option value="WA">WA</option>
+                                    <option value="SA">SA</option>
+                                    <option value="TAS">TAS</option>
+                                    <option value="ACT">ACT</option>
+                                    <option value="NT">NT</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="postcode" class="form-label">Postcode</label>
+                                <input type="text" class="form-control" id="postcode" name="postcode" placeholder="e.g. 2000">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="country" class="form-label">Country</label>
+                                <input type="text" class="form-control" id="country" name="country" value="Australia" placeholder="Australia">
+                            </div>
+                        </div>
+
+                        <!-- Emergency Contact Section -->
+                        <h6 class="text-primary mb-3 mt-4"><i class="bi bi-telephone"></i> Emergency Contact</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="emergencyContactName" class="form-label">Emergency Contact Name</label>
+                                <input type="text" class="form-control" id="emergencyContactName" name="emergencyContactName" placeholder="Full name of emergency contact">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="emergencyContactNumber" class="form-label">Emergency Contact Number</label>
+                                <input type="tel" class="form-control" id="emergencyContactNumber" name="emergencyContactNumber" placeholder="e.g. 0400 123 456">
+                            </div>
+                        </div>
+                        </div>
+
+                        <!-- Step 2: Employment & Pay -->
+                        <div class="wizard-step" id="step2" style="display: none;">
+
+                        <!-- Employment Information Section -->
+                        <h6 class="text-primary mb-3 mt-4"><i class="bi bi-briefcase"></i> Employment Information</h6>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="startDate" class="form-label">Start Date</label>
+                                <input type="date" class="form-control" id="startDate" name="startDate">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="role" class="form-label">Role</label>
+                                <select class="form-control" id="role" name="role" required>
+                                    <option value="">Select Role</option>
+                                    <option value="location_manager">Location Manager</option>
+                                    <option value="employee">Employee</option>
+                                    <option value="system_admin">System Admin</option>
+                                    <option value="advisor">Advisor</option>
+                                    <option value="supervisor">Supervisor</option>
+                                    <option value="manager">Manager</option>
+                                    <option value="staff_manager">Staff Manager</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="status" class="form-label">Status</label>
+                                <select class="form-select" id="status" name="status">
+                                    <option value="Active" selected>Active</option>
+                                    <option value="Inactive">Inactive</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Employment Classification Section -->
+                        <h6 class="text-primary mb-3 mt-4"><i class="bi bi-person-badge"></i> Employment Classification</h6>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="employmentType" class="form-label">Employment Type <span class="text-danger">*</span></label>
+                                <select class="form-select" id="employmentType" name="employmentType" required>
+                                    <option value="">Select Type</option>
+                                    <option value="casual">Casual</option>
+                                    <option value="part-time">Part-Time</option>
+                                    <option value="full-time">Full-Time</option>
+                                    <option value="contractor">Contractor</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="awardLevel" class="form-label">Award Level</label>
+                                <input type="text" class="form-control" id="awardLevel" name="awardLevel" placeholder="e.g., Level 1, Supervisor">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="defaultHoursPerWeek" class="form-label">Default Hours/Week</label>
+                                <input type="number" class="form-control" id="defaultHoursPerWeek" name="defaultHoursPerWeek" step="0.5" min="0" max="80" placeholder="38">
+                            </div>
+                        </div>
+
+                        <!-- Pay Rates Section -->
+                        <h6 class="text-primary mb-3 mt-4"><i class="bi bi-cash-coin"></i> Pay Rates (per hour)</h6>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="weekdayRate" class="form-label">Weekday Rate ($)</label>
+                                <input type="number" step="0.01" class="form-control" id="weekdayRate" name="weekdayRate" placeholder="25.00">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="saturdayRate" class="form-label">Saturday Rate ($)</label>
+                                <input type="number" step="0.01" class="form-control" id="saturdayRate" name="saturdayRate" placeholder="30.00">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="sundayRate" class="form-label">Sunday Rate ($)</label>
+                                <input type="number" step="0.01" class="form-control" id="sundayRate" name="sundayRate" placeholder="35.00">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="publicHolidayRate" class="form-label">Public Holiday Rate ($)</label>
+                                <input type="number" step="0.01" class="form-control" id="publicHolidayRate" name="publicHolidayRate" placeholder="50.00">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="overtimeRate" class="form-label">Overtime Rate ($)</label>
+                                <input type="number" step="0.01" class="form-control" id="overtimeRate" name="overtimeRate" placeholder="37.50">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="payFrequency" class="form-label">Pay Frequency</label>
+                                <select class="form-select" id="payFrequency" name="payFrequency">
+                                    <option value="weekly">Weekly</option>
+                                    <option value="fortnightly" selected>Fortnightly</option>
+                                    <option value="monthly">Monthly</option>
+                                </select>
+                            </div>
+                        </div>
+                        </div>
+
+                        <!-- Step 3: Compliance & Banking -->
+                        <div class="wizard-step" id="step3" style="display: none;">
+
+                        <!-- Tax & Compliance Section -->
+                        <h6 class="text-primary mb-3 mt-4"><i class="bi bi-shield-check"></i> Tax & Compliance</h6>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="taxRef" class="form-label">Tax File Number (TFN)</label>
+                                <input type="text" class="form-control" id="taxRef" name="taxRef" pattern="[0-9]{9}" placeholder="123 456 789" maxlength="11" oninput="formatTFN(this)">
+                                <small class="form-text text-muted">Required for employees (9 digits)</small>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="superFund" class="form-label">Superannuation Fund</label>
+                                <input type="text" class="form-control" id="superFund" name="superFund" placeholder="e.g., AustralianSuper">
+                                <small class="form-text text-muted">Required for employees</small>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="superMemberId" class="form-label">Super Member ID</label>
+                                <input type="text" class="form-control" id="superMemberId" name="superMemberId" placeholder="Member number">
+                            </div>
+                        </div>
+
+                        <!-- System Integration Section -->
+                        <h6 class="text-primary mb-3 mt-4"><i class="bi bi-link-45deg"></i> System Integration</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="payrollRef" class="form-label">Payroll Reference ID</label>
+                                <input type="text" class="form-control" id="payrollRef" name="payrollRef" placeholder="External payroll system ID (Xero, MYOB, etc.)">
+                                <small class="form-text text-muted">Optional - for external payroll system integration</small>
+                            </div>
+                        </div>
+
+                        <!-- Bank Details Section -->
+                        <h6 class="text-primary mb-3 mt-4"><i class="bi bi-bank"></i> Bank Details</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="accountName" class="form-label">Account Name</label>
+                                <input type="text" class="form-control" id="accountName" name="accountName" placeholder="Full name on bank account">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="bsb" class="form-label">BSB</label>
+                                <input type="text" class="form-control" id="bsb" name="bsb" placeholder="e.g. 123-456" maxlength="7" oninput="formatBSB(this)">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="accountNumber" class="form-label">Account Number</label>
+                                <input type="text" class="form-control" id="accountNumber" name="accountNumber" placeholder="Account number">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="bankName" class="form-label">Bank Name</label>
+                                <input type="text" class="form-control" id="bankName" name="bankName" placeholder="e.g. Commonwealth Bank">
+                            </div>
+                        </div>
+                        </div>
+
+                        <!-- Step 4: Documents -->
+                        <div class="wizard-step" id="step4" style="display: none;">
+
+                        <!-- Profile Picture Section -->
+                        <h6 class="text-primary mb-3 mt-4"><i class="bi bi-image"></i> Profile Picture</h6>
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label for="profilePic" class="form-label">Profile Picture</label>
+                                <input type="file" class="form-control" id="profilePic" name="profilePic" accept="image/*">
+                                <small class="form-text text-muted">Upload a professional photo (JPG, PNG, max 5MB)</small>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+                        <h6 class="text-primary mb-3"><i class="bi bi-file-earmark-text"></i> Employment Documents</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="employmentContract" class="form-label">Employment Contract</label>
+                                <input type="file" class="form-control" id="employmentContract" name="employmentContract" accept=".pdf,.doc,.docx">
+                                <small class="form-text text-muted">Upload signed employment contract (PDF, Word)</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="taxDeclaration" class="form-label">Tax Declaration Form</label>
+                                <input type="file" class="form-control" id="taxDeclaration" name="taxDeclaration" accept=".pdf,.doc,.docx">
+                                <small class="form-text text-muted">Tax File Number declaration form</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="bankDetails" class="form-label">Bank Account Details</label>
+                                <input type="file" class="form-control" id="bankDetails" name="bankDetails" accept=".pdf,.jpg,.jpeg,.png">
+                                <small class="form-text text-muted">Bank statement or account details document</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="otherDocuments" class="form-label">Other Documents</label>
+                                <input type="file" class="form-control" id="otherDocuments" name="otherDocuments" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" multiple>
+                                <small class="form-text text-muted">Any additional employment-related documents</small>
+                            </div>
+                        </div>
+                        </div>
+
+                        <!-- Step 5: Summary & Confirmation -->
+                        <div class="wizard-step" id="step5" style="display: none;">
+
+                            <div id="summaryContent">
+                                <!-- Summary content will be dynamically generated -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer d-flex justify-content-between">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="bi bi-x-lg"></i> Cancel
+                        </button>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-outline-primary" id="prevBtn" style="display: none;">
+                                <i class="bi bi-arrow-left"></i> Previous
+                            </button>
+                            <button type="button" class="btn btn-primary" id="nextBtn">
+                                Next <i class="bi bi-arrow-right"></i>
+                            </button>
+                            <button type="submit" class="btn btn-success" id="submitBtn" style="display: none;">
+                                <i class="bi bi-check-lg"></i> Create Staff Member
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Staff Modal -->
+    <div class="modal fade" id="editStaffModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form id="editStaffForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Staff</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="staffId">
+
+                        <!-- Essential Fields Only for Quick Editing -->
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="editFirstName" class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="editFirstName" name="firstName" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="editLastName" class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="editLastName" name="lastName" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="editRole" class="form-label">Role</label>
+                                <select class="form-control" id="editRole" name="role" required>
+                                    <option value="">Select Role</option>
+                                    <option value="location_manager">Location Manager</option>
+                                    <option value="employee">Employee</option>
+                                    <option value="system_admin">System Admin</option>
+                                    <option value="advisor">Advisor</option>
+                                    <option value="supervisor">Supervisor</option>
+                                    <option value="manager">Manager</option>
+                                    <option value="staff_manager">Staff Manager</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="editWeekdayRate" class="form-label">Weekday Rate ($)</label>
+                                <input type="number" step="0.01" class="form-control" id="editWeekdayRate" name="weekdayRate">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="editStatus" class="form-label">Status</label>
+                                <select class="form-select" id="editStatus" name="status">
+                                    <option value="Active">Active</option>
+                                    <option value="Inactive">Inactive</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="editVisaStatus" class="form-label">Visa Status</label>
+                                <select class="form-select" id="editVisaStatus" name="visaStatus">
+                                    <option value="">Select Visa Status</option>
+                                    <option value="Citizen">Citizen</option>
+                                    <option value="PR">PR</option>
+                                    <option value="Work Visa">Work Visa</option>
+                                    <option value="Student Visa">Student Visa</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mt-3">
+                            <p class="text-muted small">
+                                <i class="bi bi-info-circle"></i>
+                                For detailed information editing, please delete and re-add the staff member using the full wizard.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success">Update</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Roster Modal -->
+    <div class="modal fade" id="addRosterModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form id="addRosterForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Create New Roster</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="rosterDate" class="form-label">Date</label>
+                                <input type="date" class="form-control" id="rosterDate" name="rosterDate" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="jobDescription" class="form-label">Job Description</label>
+                                <input type="text" class="form-control" id="jobDescription" name="jobDescription" placeholder="e.g. Wedding Reception, Corporate Event" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="rosterStartTime" class="form-label">Start Time</label>
+                                <input type="time" class="form-control" id="rosterStartTime" name="startTime" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="rosterEndTime" class="form-label">End Time</label>
+                                <input type="time" class="form-control" id="rosterEndTime" name="endTime" required>
+                            </div>
+                            <div class="col-12">
+                                <label for="activeStaffList" class="form-label">Select Staff (Active Only)</label>
+                                <div id="activeStaffList" class="border rounded p-3" style="max-height: 200px; overflow-y: auto;">
+                                    <p class="text-muted">No active staff available.</p>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <label for="rosterNotes" class="form-label">Additional Notes</label>
+                                <textarea class="form-control" id="rosterNotes" name="notes" rows="3" placeholder="Any special instructions or requirements"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success">Create Roster</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Roster Modal -->
+    <div class="modal fade" id="editRosterModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form id="editRosterForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Roster</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="rosterId">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="editRosterDate" class="form-label">Date</label>
+                                <input type="date" class="form-control" id="editRosterDate" name="rosterDate" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editJobDescription" class="form-label">Job Description</label>
+                                <input type="text" class="form-control" id="editJobDescription" name="jobDescription" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editRosterStartTime" class="form-label">Start Time</label>
+                                <input type="time" class="form-control" id="editRosterStartTime" name="startTime" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editRosterEndTime" class="form-label">End Time</label>
+                                <input type="time" class="form-control" id="editRosterEndTime" name="endTime" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editRosterStatus" class="form-label">Status</label>
+                                <select class="form-select" id="editRosterStatus" name="status">
+                                    <option value="upcoming">Upcoming</option>
+                                    <option value="completed">Completed</option>
+                                    <option value="cancelled">Cancelled</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label for="editActiveStaffList" class="form-label">Select Staff (Active Only)</label>
+                                <div id="editActiveStaffList" class="border rounded p-3" style="max-height: 200px; overflow-y: auto;">
+                                    <p class="text-muted">No active staff available.</p>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <label for="editRosterNotes" class="form-label">Additional Notes</label>
+                                <textarea class="form-control" id="editRosterNotes" name="notes" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success">Update Roster</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="public-holidays-config.js"></script>
+    <script src="admin.js"></script>
+
+</body>
+</html>
