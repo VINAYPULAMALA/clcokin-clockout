@@ -1,0 +1,1722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Panel - Business & Venue Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .navigation {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 15px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #6c757d;
+            transition: all 0.3s ease;
+        }
+
+        .nav-tab.active {
+            background: white;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .nav-tab:hover {
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .form-container {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .form-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-title::before {
+            content: '';
+            width: 4px;
+            height: 25px;
+            background: #667eea;
+            margin-right: 15px;
+            border-radius: 2px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: transform 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .table-header {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .table-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th,
+        .table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .expand-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .venues-row {
+            display: none;
+            background: #f1f3f4;
+        }
+
+        .venues-row.show {
+            display: table-row;
+        }
+
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .alert.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .search-container {
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            max-width: 400px;
+            padding: 10px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            border-left: 4px solid #667eea;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .stat-change {
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+
+        .stat-change.positive {
+            color: #28a745;
+        }
+
+        .stat-change.negative {
+            color: #dc3545;
+        }
+
+        .pagination-container {
+            padding: 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .pagination-info {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .page-numbers {
+            display: flex;
+            gap: 5px;
+        }
+
+        .page-number {
+            padding: 8px 12px;
+            border: 1px solid #e9ecef;
+            background: white;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .page-number:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .page-number.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .page-number.disabled {
+            background: #f8f9fa;
+            color: #6c757d;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 768px) {
+            .pagination-container {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .pagination-controls {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Business & Venue Management</h1>
+            <p>Manage your businesses and venues from one central location</p>
+        </div>
+
+        <div class="content">
+            <div class="navigation">
+                <button class="nav-tab active" onclick="showSection('stats')">Statistics</button>
+                <button class="nav-tab" onclick="showSection('businesses')">Businesses</button>
+                <button class="nav-tab" onclick="showSection('venues')">Venues</button>
+            </div>
+
+            <div id="alert" class="alert"></div>
+
+            <!-- Statistics Section -->
+            <div id="stats" class="section active">
+                <h2 class="form-title">System Statistics</h2>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalBusinesses">0</div>
+                        <div class="stat-label">Total Businesses</div>
+                        <div class="stat-change positive" id="businessChange">+0 this month</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalVenues">0</div>
+                        <div class="stat-label">Total Venues</div>
+                        <div class="stat-change positive" id="venueChange">+0 this month</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalStaff">0</div>
+                        <div class="stat-label">Total Staff</div>
+                        <div class="stat-change positive" id="staffChange">+0 this month</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-number" id="activeVenues">0</div>
+                        <div class="stat-label">Active Venues</div>
+                        <div class="stat-change" id="activeVenueChange">100%</div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3 class="table-title">Recent Activity</h3>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>Action</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody id="activityTableBody">
+                            <!-- Recent activity will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="stats-grid" style="margin-top: 30px;">
+                    <div class="stat-card">
+                        <div class="stat-number" id="venuesByState">-</div>
+                        <div class="stat-label">Most Venues (State)</div>
+                        <div class="stat-change" id="topState">-</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-number" id="avgVenuesPerBusiness">0</div>
+                        <div class="stat-label">Avg Venues per Business</div>
+                        <div class="stat-change" id="venueDistribution">-</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-number" id="newestBusiness">-</div>
+                        <div class="stat-label">Newest Business</div>
+                        <div class="stat-change" id="businessAge">-</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-number" id="systemUptime">-</div>
+                        <div class="stat-label">System Status</div>
+                        <div class="stat-change positive" id="systemStatus">Online</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Business Management Section -->
+            <div id="businesses" class="section">
+                <div class="form-container">
+                    <h2 class="form-title">Add New Business</h2>
+                    <form id="businessForm">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="businessName">Business Name *</label>
+                                <input type="text" id="businessName" name="businessName" required
+                                       pattern="^[a-zA-Z0-9\s&\-\.']+$"
+                                       title="Business name can only contain letters, numbers, spaces, and common business symbols (&, -, ., ')"
+                                       placeholder="e.g., Smith's Restaurant & Bar">
+                                <small style="color: #6c757d; font-size: 0.85em;">Letters, numbers, spaces, and symbols (&, -, ., ') only</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="abn">ABN (Australian Business Number) *</label>
+                                <input type="text" id="abn" name="abn" required
+                                       pattern="[0-9]{11}"
+                                       maxlength="11"
+                                       title="ABN must be exactly 11 digits"
+                                       placeholder="12345678901">
+                                <small style="color: #6c757d; font-size: 0.85em;">Must be exactly 11 digits (e.g., 12345678901)</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="ownerName">Owner Name *</label>
+                                <input type="text" id="ownerName" name="ownerName" required
+                                       pattern="^[a-zA-Z\s\-'\.]+$"
+                                       title="Owner name can only contain letters, spaces, hyphens, apostrophes, and periods"
+                                       placeholder="e.g., John Smith-O'Connor">
+                                <small style="color: #6c757d; font-size: 0.85em;">Letters, spaces, hyphens, apostrophes, and periods only</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="state">State *</label>
+                                <select id="state" name="state" required>
+                                    <option value="">Choose state...</option>
+                                    <option value="NSW">NSW - New South Wales</option>
+                                    <option value="VIC">VIC - Victoria</option>
+                                    <option value="QLD">QLD - Queensland</option>
+                                    <option value="WA">WA - Western Australia</option>
+                                    <option value="SA">SA - South Australia</option>
+                                    <option value="TAS">TAS - Tasmania</option>
+                                    <option value="ACT">ACT - Australian Capital Territory</option>
+                                    <option value="NT">NT - Northern Territory</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="location">Location/Address *</label>
+                                <input type="text" id="location" name="location" required
+                                       minlength="10"
+                                       title="Please provide a complete address including street, suburb, and postcode"
+                                       placeholder="e.g., 22 Burrow Street, Hobart, TAS, 7000">
+                                <small style="color: #6c757d; font-size: 0.85em;">Complete address: Street, Suburb, State, Postcode</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="contactEmail">Contact Email *</label>
+                                <input type="email" id="contactEmail" name="contactEmail" required
+                                       pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                                       title="Please enter a valid email address"
+                                       placeholder="e.g., owner@business.com.au">
+                                <small style="color: #6c757d; font-size: 0.85em;">Valid email format required (e.g., name@domain.com)</small>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn">Add Business</button>
+                    </form>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3 class="table-title">Businesses</h3>
+                        <div class="search-container">
+                            <input type="text" class="search-input" placeholder="Search businesses..." id="businessSearch">
+                        </div>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Business Name</th>
+                                <th>ABN</th>
+                                <th>Owner</th>
+                                <th>State</th>
+                                <th>Location</th>
+                                <th>Contact Email</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="businessTableBody">
+                            <!-- Businesses will be loaded here -->
+                        </tbody>
+                    </table>
+
+                    <!-- Pagination Controls -->
+                    <div id="businessPagination" class="pagination-container" style="display: none;">
+                        <div class="pagination-info">
+                            <span id="businessPaginationInfo">Showing 1-10 of 0 businesses</span>
+                        </div>
+                        <div class="pagination-controls">
+                            <button id="prevBusinessPage" class="btn btn-secondary" onclick="changePage('business', -1)" disabled>Previous</button>
+                            <span id="businessPageNumbers" class="page-numbers"></span>
+                            <button id="nextBusinessPage" class="btn btn-secondary" onclick="changePage('business', 1)" disabled>Next</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Venue Management Section -->
+            <div id="venues" class="section">
+                <div class="form-container">
+                    <h2 class="form-title">Add New Venue</h2>
+                    <form id="venueForm">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="businessSelect">Select Business *</label>
+                                <select id="businessSelect" name="businessId" required>
+                                    <option value="">Choose a business...</option>
+                                </select>
+                                <small style="color: #6c757d; font-size: 0.85em;">Select the business that owns this venue</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="venueName">Venue Name *</label>
+                                <input type="text" id="venueName" name="venueName" required
+                                       pattern="^[a-zA-Z0-9\s&\-\.'#]+$"
+                                       title="Venue name can only contain letters, numbers, spaces, and common symbols (&, -, ., ', #)"
+                                       placeholder="e.g., Main Restaurant, North Branch">
+                                <small style="color: #6c757d; font-size: 0.85em;">Letters, numbers, spaces, and symbols (&, -, ., ', #) only</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="venueState">State *</label>
+                                <select id="venueState" name="state" required>
+                                    <option value="">Choose state...</option>
+                                    <option value="NSW">NSW - New South Wales</option>
+                                    <option value="VIC">VIC - Victoria</option>
+                                    <option value="QLD">QLD - Queensland</option>
+                                    <option value="TAS">TAS - Tasmania</option>
+                                    <option value="SA">SA - South Australia</option>
+                                    <option value="WA">WA - Western Australia</option>
+                                    <option value="NT">NT - Northern Territory</option>
+                                    <option value="ACT">ACT - Australian Capital Territory</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="venueLocation">Location/Address *</label>
+                                <input type="text" id="venueLocation" name="location" required
+                                       minlength="10"
+                                       title="Please provide a complete address including street, suburb, and postcode"
+                                       placeholder="e.g., 456 Collins Street, Melbourne, VIC, 3000">
+                                <small style="color: #6c757d; font-size: 0.85em;">Complete address: Street, Suburb, State, Postcode</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="subscriptionPlan">Subscription Plan *</label>
+                                <select id="subscriptionPlan" name="subscriptionPlan" required>
+                                    <option value="">Choose plan...</option>
+                                    <option value="standard">Standard - Basic features</option>
+                                    <option value="premium">Premium - Advanced features</option>
+                                    <option value="enterprise">Enterprise - Full features</option>
+                                </select>
+                                <small style="color: #6c757d; font-size: 0.85em;">Select appropriate plan for this venue's needs</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="subscriptionExpiry">Subscription Expiry *</label>
+                                <input type="date" id="subscriptionExpiry" name="subscriptionExpiry" required
+                                       title="Select the date when the subscription expires">
+                                <small style="color: #6c757d; font-size: 0.85em;">Date when the subscription expires</small>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn">Add Venue</button>
+                    </form>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3 class="table-title">Venues</h3>
+                        <div class="search-container">
+                            <input type="text" class="search-input" placeholder="Search venues..." id="venueSearch">
+                        </div>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Venue Name</th>
+                                <th>Business</th>
+                                <th>State</th>
+                                <th>Location</th>
+                                <th>Plan</th>
+                                <th>Expiry</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="venueTableBody">
+                            <!-- Venues will be loaded here -->
+                        </tbody>
+                    </table>
+
+                    <!-- Pagination Controls -->
+                    <div id="venuePagination" class="pagination-container" style="display: none;">
+                        <div class="pagination-info">
+                            <span id="venuePaginationInfo">Showing 1-10 of 0 venues</span>
+                        </div>
+                        <div class="pagination-controls">
+                            <button id="prevVenuePage" class="btn btn-secondary" onclick="changePage('venue', -1)" disabled>Previous</button>
+                            <span id="venuePageNumbers" class="page-numbers"></span>
+                            <button id="nextVenuePage" class="btn btn-secondary" onclick="changePage('venue', 1)" disabled>Next</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Business Modal -->
+    <div class="modal fade" id="editBusinessModal" tabindex="-1" aria-labelledby="editBusinessModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="editBusinessModalLabel">
+                        <i class="bi bi-building"></i> Edit Business Information
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                <form id="editBusinessForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="editBusinessName">Business Name *</label>
+                            <input type="text" id="editBusinessName" name="editBusinessName" required
+                                   pattern="^[a-zA-Z0-9\s&\-\.']+$"
+                                   title="Business name can only contain letters, numbers, spaces, and common business symbols (&, -, ., ')"
+                                   placeholder="e.g., Smith's Restaurant & Bar">
+                            <small style="color: #6c757d; font-size: 0.85em;">Letters, numbers, spaces, and symbols (&, -, ., ') only</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="editAbn">ABN (Australian Business Number) *</label>
+                            <input type="text" id="editAbn" name="editAbn" required
+                                   pattern="[0-9]{11}"
+                                   maxlength="11"
+                                   title="ABN must be exactly 11 digits"
+                                   placeholder="12345678901">
+                            <small style="color: #6c757d; font-size: 0.85em;">Must be exactly 11 digits (e.g., 12345678901)</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="editOwnerName">Owner Name *</label>
+                            <input type="text" id="editOwnerName" name="editOwnerName" required
+                                   pattern="^[a-zA-Z\s\-'\.]+$"
+                                   title="Owner name can only contain letters, spaces, hyphens, apostrophes, and periods"
+                                   placeholder="e.g., John Smith-O'Connor">
+                            <small style="color: #6c757d; font-size: 0.85em;">Letters, spaces, hyphens, apostrophes, and periods only</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="editState">State *</label>
+                            <select id="editState" name="editState" required>
+                                <option value="">Choose state...</option>
+                                <option value="NSW">NSW - New South Wales</option>
+                                <option value="VIC">VIC - Victoria</option>
+                                <option value="QLD">QLD - Queensland</option>
+                                <option value="WA">WA - Western Australia</option>
+                                <option value="SA">SA - South Australia</option>
+                                <option value="TAS">TAS - Tasmania</option>
+                                <option value="ACT">ACT - Australian Capital Territory</option>
+                                <option value="NT">NT - Northern Territory</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="editLocation">Location/Address *</label>
+                            <input type="text" id="editLocation" name="editLocation" required
+                                   minlength="10"
+                                   title="Please provide a complete address including street, suburb, and postcode"
+                                   placeholder="e.g., 22 Burrow Street, Hobart, TAS, 7000">
+                            <small style="color: #6c757d; font-size: 0.85em;">Complete address: Street, Suburb, State, Postcode</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="editContactEmail">Contact Email *</label>
+                            <input type="email" id="editContactEmail" name="editContactEmail" required
+                                   pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                                   title="Please enter a valid email address"
+                                   placeholder="e.g., owner@business.com.au">
+                            <small style="color: #6c757d; font-size: 0.85em;">Valid email format required (e.g., name@domain.com)</small>
+                        </div>
+                    </div>
+                </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" form="editBusinessForm" class="btn btn-primary">
+                        <i class="bi bi-check-circle"></i> Update Business
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Venue Modal -->
+    <div class="modal fade" id="editVenueModal" tabindex="-1" aria-labelledby="editVenueModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="editVenueModalLabel">
+                        <i class="bi bi-shop"></i> Edit Venue Information
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editVenueForm">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="editVenueBusinessSelect" class="form-label">Business *</label>
+                                <select class="form-select" id="editVenueBusinessSelect" name="editVenueBusinessSelect" required>
+                                    <option value="">Choose business...</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editVenueName" class="form-label">Venue Name *</label>
+                                <input type="text" class="form-control" id="editVenueName" name="editVenueName" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editVenueState" class="form-label">State *</label>
+                                <select class="form-select" id="editVenueState" name="editVenueState" required>
+                                    <option value="">Choose state...</option>
+                                    <option value="NSW">NSW - New South Wales</option>
+                                    <option value="VIC">VIC - Victoria</option>
+                                    <option value="QLD">QLD - Queensland</option>
+                                    <option value="WA">WA - Western Australia</option>
+                                    <option value="SA">SA - South Australia</option>
+                                    <option value="TAS">TAS - Tasmania</option>
+                                    <option value="ACT">ACT - Australian Capital Territory</option>
+                                    <option value="NT">NT - Northern Territory</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editVenueLocation" class="form-label">Location/Address *</label>
+                                <input type="text" class="form-control" id="editVenueLocation" name="editVenueLocation" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editSubscriptionPlan" class="form-label">Subscription Plan *</label>
+                                <select class="form-select" id="editSubscriptionPlan" name="editSubscriptionPlan" required>
+                                    <option value="">Choose plan...</option>
+                                    <option value="basic">Basic Plan</option>
+                                    <option value="standard">Standard Plan</option>
+                                    <option value="premium">Premium Plan</option>
+                                    <option value="enterprise">Enterprise Plan</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editSubscriptionExpiry" class="form-label">Subscription Expiry *</label>
+                                <input type="date" class="form-control" id="editSubscriptionExpiry" name="editSubscriptionExpiry" required>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" form="editVenueForm" class="btn btn-success">
+                        <i class="bi bi-check-circle"></i> Update Venue
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let businesses = [];
+        let venues = [];
+        let businessPagination = {
+            currentPage: 1,
+            totalPages: 1,
+            totalItems: 0,
+            itemsPerPage: 10
+        };
+        let venuePagination = {
+            currentPage: 1,
+            totalPages: 1,
+            totalItems: 0,
+            itemsPerPage: 10
+        };
+
+        // API base URL
+        const API_BASE_URL = 'http://localhost:4000';
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadBusinesses();
+            loadVenues();
+            loadStats();
+            setupEventListeners();
+        });
+
+        // Event listeners
+        function setupEventListeners() {
+            document.getElementById('businessForm').addEventListener('submit', handleBusinessSubmit);
+            document.getElementById('venueForm').addEventListener('submit', handleVenueSubmit);
+            document.getElementById('editBusinessForm').addEventListener('submit', handleBusinessUpdate);
+            document.getElementById('editVenueForm').addEventListener('submit', handleVenueUpdate);
+            document.getElementById('businessSearch').addEventListener('input', filterBusinesses);
+            document.getElementById('venueSearch').addEventListener('input', filterVenues);
+
+            // Add real-time validation for business and venue forms
+            setupBusinessFormValidation();
+            setupVenueFormValidation();
+            setupEditBusinessFormValidation();
+        }
+
+        // Business form validation
+        function setupBusinessFormValidation() {
+            const abnInput = document.getElementById('abn');
+            const businessNameInput = document.getElementById('businessName');
+            const ownerNameInput = document.getElementById('ownerName');
+            const emailInput = document.getElementById('contactEmail');
+
+            // ABN: Only allow numbers and limit to 11 digits
+            abnInput.addEventListener('input', function(e) {
+                e.target.value = e.target.value.replace(/[^0-9]/g, '').substring(0, 11);
+
+                // Visual feedback
+                if (e.target.value.length === 11) {
+                    e.target.style.borderColor = '#28a745';
+                } else if (e.target.value.length > 0) {
+                    e.target.style.borderColor = '#dc3545';
+                } else {
+                    e.target.style.borderColor = '#e9ecef';
+                }
+            });
+
+            // Business Name: Remove invalid characters
+            businessNameInput.addEventListener('input', function(e) {
+                const validPattern = /^[a-zA-Z0-9\s&\-\.']*$/;
+                if (!validPattern.test(e.target.value)) {
+                    e.target.value = e.target.value.replace(/[^a-zA-Z0-9\s&\-\.']/g, '');
+                }
+            });
+
+            // Owner Name: Only letters, spaces, hyphens, apostrophes, periods
+            ownerNameInput.addEventListener('input', function(e) {
+                const validPattern = /^[a-zA-Z\s\-'\.]*$/;
+                if (!validPattern.test(e.target.value)) {
+                    e.target.value = e.target.value.replace(/[^a-zA-Z\s\-'\.]/g, '');
+                }
+            });
+
+            // Email: Visual feedback
+            emailInput.addEventListener('input', function(e) {
+                const emailPattern = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
+                if (emailPattern.test(e.target.value)) {
+                    e.target.style.borderColor = '#28a745';
+                } else if (e.target.value.length > 0) {
+                    e.target.style.borderColor = '#dc3545';
+                } else {
+                    e.target.style.borderColor = '#e9ecef';
+                }
+            });
+        }
+
+        // Venue form validation
+        function setupVenueFormValidation() {
+            const venueNameInput = document.getElementById('venueName');
+            const venueLocationInput = document.getElementById('venueLocation');
+            const subscriptionExpiryInput = document.getElementById('subscriptionExpiry');
+            const businessSelectInput = document.getElementById('businessSelect');
+            const subscriptionPlanInput = document.getElementById('subscriptionPlan');
+
+            // Venue Name: Only allow valid characters
+            venueNameInput.addEventListener('input', function(e) {
+                const validPattern = /^[a-zA-Z0-9\s&\-\.'#]*$/;
+                if (!validPattern.test(e.target.value)) {
+                    e.target.value = e.target.value.replace(/[^a-zA-Z0-9\s&\-\.'#]/g, '');
+                }
+            });
+
+            // Location: Visual feedback for minimum length
+            venueLocationInput.addEventListener('input', function(e) {
+                if (e.target.value.length >= 10) {
+                    e.target.style.borderColor = '#28a745';
+                } else if (e.target.value.length > 0) {
+                    e.target.style.borderColor = '#dc3545';
+                } else {
+                    e.target.style.borderColor = '#e9ecef';
+                }
+            });
+
+            // Subscription Expiry: Prevent past dates
+            subscriptionExpiryInput.addEventListener('change', function(e) {
+                const selectedDate = new Date(e.target.value);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                if (selectedDate < today) {
+                    e.target.style.borderColor = '#dc3545';
+                    showAlert('Subscription expiry cannot be in the past', 'error');
+                    e.target.value = '';
+                } else {
+                    e.target.style.borderColor = '#28a745';
+                }
+            });
+
+            // Business Select: Visual feedback
+            businessSelectInput.addEventListener('change', function(e) {
+                if (e.target.value) {
+                    e.target.style.borderColor = '#28a745';
+                } else {
+                    e.target.style.borderColor = '#e9ecef';
+                }
+            });
+
+            // Subscription Plan: Visual feedback
+            subscriptionPlanInput.addEventListener('change', function(e) {
+                if (e.target.value) {
+                    e.target.style.borderColor = '#28a745';
+                } else {
+                    e.target.style.borderColor = '#e9ecef';
+                }
+            });
+
+            // Set minimum date for subscription expiry to today
+            const today = new Date().toISOString().split('T')[0];
+            subscriptionExpiryInput.setAttribute('min', today);
+        }
+
+        // Edit business form validation (similar to business form)
+        function setupEditBusinessFormValidation() {
+            const editAbnInput = document.getElementById('editAbn');
+            const editBusinessNameInput = document.getElementById('editBusinessName');
+            const editOwnerNameInput = document.getElementById('editOwnerName');
+            const editEmailInput = document.getElementById('editContactEmail');
+
+            // ABN: Only allow numbers and limit to 11 digits
+            editAbnInput.addEventListener('input', function(e) {
+                e.target.value = e.target.value.replace(/[^0-9]/g, '').substring(0, 11);
+
+                // Visual feedback
+                if (e.target.value.length === 11) {
+                    e.target.style.borderColor = '#28a745';
+                } else if (e.target.value.length > 0) {
+                    e.target.style.borderColor = '#dc3545';
+                } else {
+                    e.target.style.borderColor = '#e9ecef';
+                }
+            });
+
+            // Business Name: Remove invalid characters
+            editBusinessNameInput.addEventListener('input', function(e) {
+                const validPattern = /^[a-zA-Z0-9\s&\-\.']*$/;
+                if (!validPattern.test(e.target.value)) {
+                    e.target.value = e.target.value.replace(/[^a-zA-Z0-9\s&\-\.']/g, '');
+                }
+            });
+
+            // Owner Name: Only letters, spaces, hyphens, apostrophes, periods
+            editOwnerNameInput.addEventListener('input', function(e) {
+                const validPattern = /^[a-zA-Z\s\-'\.]*$/;
+                if (!validPattern.test(e.target.value)) {
+                    e.target.value = e.target.value.replace(/[^a-zA-Z\s\-'\.]/g, '');
+                }
+            });
+
+            // Email: Visual feedback
+            editEmailInput.addEventListener('input', function(e) {
+                const emailPattern = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
+                if (emailPattern.test(e.target.value)) {
+                    e.target.style.borderColor = '#28a745';
+                } else if (e.target.value.length > 0) {
+                    e.target.style.borderColor = '#dc3545';
+                } else {
+                    e.target.style.borderColor = '#e9ecef';
+                }
+            });
+        }
+
+        // Navigation
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Remove active class from all tabs
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected section
+            document.getElementById(sectionName).classList.add('active');
+
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+
+        // Business form handling
+        async function handleBusinessSubmit(e) {
+            e.preventDefault();
+
+            const formData = new FormData(e.target);
+            const businessData = {
+                business_name: formData.get('businessName'),
+                abn: formData.get('abn'),
+                owner_name: formData.get('ownerName'),
+                state: formData.get('state'),
+                location: formData.get('location'),
+                contact_email: formData.get('contactEmail')
+            };
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/businesses`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(businessData)
+                });
+
+                if (response.ok) {
+                    showAlert('Business added successfully!', 'success');
+                    e.target.reset();
+                    loadBusinesses(businessPagination.currentPage);
+                    updateStats();
+                } else {
+                    const error = await response.text();
+                    showAlert('Error adding business: ' + error, 'error');
+                }
+            } catch (error) {
+                showAlert('Network error: ' + error.message, 'error');
+            }
+        }
+
+        // Venue form handling
+        async function handleVenueSubmit(e) {
+            e.preventDefault();
+
+            const formData = new FormData(e.target);
+            const venueData = {
+                business_id: parseInt(formData.get('businessId')),
+                venue_name: formData.get('venueName'),
+                state: formData.get('state'),
+                location: formData.get('location'),
+                subscription_plan: formData.get('subscriptionPlan'),
+                subscription_expiry: formData.get('subscriptionExpiry'),
+                subscription_status: 'active'
+            };
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/venues`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(venueData)
+                });
+
+                if (response.ok) {
+                    showAlert('Venue added successfully!', 'success');
+                    e.target.reset();
+                    loadVenues(venuePagination.currentPage);
+                    updateStats();
+                } else {
+                    const error = await response.text();
+                    showAlert('Error adding venue: ' + error, 'error');
+                }
+            } catch (error) {
+                showAlert('Network error: ' + error.message, 'error');
+            }
+        }
+
+        // Load businesses with pagination
+        async function loadBusinesses(page = 1) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/businesses?page=${page}&limit=${businessPagination.itemsPerPage}`);
+                if (response.ok) {
+                    const result = await response.json();
+                    businesses = result.data;
+                    businessPagination = {
+                        currentPage: result.pagination.currentPage,
+                        totalPages: result.pagination.totalPages,
+                        totalItems: result.pagination.totalItems,
+                        itemsPerPage: result.pagination.itemsPerPage
+                    };
+
+                    renderBusinessTable();
+                    renderBusinessPagination();
+                    populateBusinessSelect();
+                    updateStats();
+                } else {
+                    showAlert('Error loading businesses', 'error');
+                }
+            } catch (error) {
+                showAlert('Network error: ' + error.message, 'error');
+            }
+        }
+
+        // Load venues with pagination
+        async function loadVenues(page = 1) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/venues?page=${page}&limit=${venuePagination.itemsPerPage}`);
+                if (response.ok) {
+                    const result = await response.json();
+                    venues = result.data;
+                    venuePagination = {
+                        currentPage: result.pagination.currentPage,
+                        totalPages: result.pagination.totalPages,
+                        totalItems: result.pagination.totalItems,
+                        itemsPerPage: result.pagination.itemsPerPage
+                    };
+
+                    renderVenueTable();
+                    renderVenuePagination();
+                    updateStats();
+                } else {
+                    showAlert('Error loading venues', 'error');
+                }
+            } catch (error) {
+                showAlert('Network error: ' + error.message, 'error');
+            }
+        }
+
+        // Load statistics
+        async function loadStats() {
+            try {
+                // Set staff count to 0 for now (staff functionality not implemented yet)
+                document.getElementById('totalStaff').textContent = '0';
+                document.getElementById('staffChange').textContent = '+0 this month';
+
+                // Load recent activity
+                loadRecentActivity();
+            } catch (error) {
+                console.log('Stats loading error:', error.message);
+            }
+        }
+
+        // Update statistics display
+        function updateStats() {
+            // Update basic counts
+            document.getElementById('totalBusinesses').textContent = businesses.length;
+            document.getElementById('totalVenues').textContent = venues.length;
+            document.getElementById('activeVenues').textContent = venues.length;
+
+            // Calculate venues by state
+            const stateCount = {};
+            venues.forEach(venue => {
+                stateCount[venue.state] = (stateCount[venue.state] || 0) + 1;
+            });
+
+            if (Object.keys(stateCount).length > 0) {
+                const topState = Object.keys(stateCount).reduce((a, b) => stateCount[a] > stateCount[b] ? a : b);
+                document.getElementById('venuesByState').textContent = stateCount[topState];
+                document.getElementById('topState').textContent = topState;
+            }
+
+            // Calculate average venues per business
+            const avgVenues = businesses.length > 0 ? (venues.length / businesses.length).toFixed(1) : 0;
+            document.getElementById('avgVenuesPerBusiness').textContent = avgVenues;
+
+            // Find newest business
+            if (businesses.length > 0) {
+                const newest = businesses.reduce((a, b) => new Date(a.created_at) > new Date(b.created_at) ? a : b);
+                const businessName = newest.name || newest.business_name || 'Unknown Business';
+                document.getElementById('newestBusiness').textContent = businessName.length > 15 ?
+                    businessName.substring(0, 15) + '...' : businessName;
+                const daysAgo = Math.floor((new Date() - new Date(newest.created_at)) / (1000 * 60 * 60 * 24));
+                document.getElementById('businessAge').textContent = `${daysAgo} days ago`;
+            }
+        }
+
+        // Update staff statistics
+        function updateStaffStats(staff) {
+            document.getElementById('totalStaff').textContent = staff.length;
+
+            // Calculate monthly changes (placeholder - would need actual date filtering)
+            const thisMonth = new Date().getMonth();
+            const thisYear = new Date().getFullYear();
+
+            const businessesThisMonth = businesses.filter(b => {
+                const date = new Date(b.created_at);
+                return date.getMonth() === thisMonth && date.getFullYear() === thisYear;
+            }).length;
+
+            const venuesThisMonth = venues.filter(v => {
+                const date = new Date(v.created_at);
+                return date.getMonth() === thisMonth && date.getFullYear() === thisYear;
+            }).length;
+
+            const staffThisMonth = staff.filter(s => {
+                const date = new Date(s.created_at);
+                return date.getMonth() === thisMonth && date.getFullYear() === thisYear;
+            }).length;
+
+            document.getElementById('businessChange').textContent = `+${businessesThisMonth} this month`;
+            document.getElementById('venueChange').textContent = `+${venuesThisMonth} this month`;
+            document.getElementById('staffChange').textContent = `+${staffThisMonth} this month`;
+        }
+
+        // Load recent activity
+        function loadRecentActivity() {
+            const tbody = document.getElementById('activityTableBody');
+            tbody.innerHTML = `
+                <tr>
+                    <td>${new Date().toLocaleDateString()}</td>
+                    <td>System</td>
+                    <td>Statistics Updated</td>
+                    <td>Dashboard statistics refreshed</td>
+                </tr>
+                <tr>
+                    <td>${new Date().toLocaleDateString()}</td>
+                    <td>System</td>
+                    <td>Page Loaded</td>
+                    <td>Master admin panel accessed</td>
+                </tr>
+            `;
+        }
+
+        // Render business table
+        function renderBusinessTable(filteredBusinesses = businesses) {
+            const tbody = document.getElementById('businessTableBody');
+            tbody.innerHTML = '';
+
+            filteredBusinesses.forEach(business => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${business.name || business.business_name || 'Unknown'}</strong></td>
+                    <td>${business.abn || '-'}</td>
+                    <td>${business.owner_name || '-'}</td>
+                    <td>${business.state || '-'}</td>
+                    <td>${business.location || '-'}</td>
+                    <td>${business.contact_email || '-'}</td>
+                    <td>
+                        <button class="expand-btn" onclick="toggleVenues(${business.id}, this)">Show Venues</button>
+                        <button class="btn btn-secondary" style="margin-left: 5px; padding: 5px 10px;" onclick="editBusiness(${business.id})">Edit</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+
+                // Add venues row (hidden by default)
+                const venuesRow = document.createElement('tr');
+                venuesRow.className = 'venues-row';
+                venuesRow.id = `venues-${business.id}`;
+                venuesRow.innerHTML = `
+                    <td colspan="7">
+                        <div style="padding: 10px;">
+                            <strong>Venues for ${business.name || business.business_name || 'Unknown Business'}:</strong>
+                            <div id="venues-list-${business.id}">Loading...</div>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(venuesRow);
+            });
+        }
+
+        // Render venue table
+        function renderVenueTable(filteredVenues = venues) {
+            const tbody = document.getElementById('venueTableBody');
+            tbody.innerHTML = '';
+
+            filteredVenues.forEach(venue => {
+                const business = businesses.find(b => b.id === venue.business_id);
+
+                // Format subscription expiry date
+                const expiryDate = venue.subscription_expiry ?
+                    new Date(venue.subscription_expiry).toLocaleDateString() : '-';
+
+                // Determine status color based on expiry
+                const isExpired = venue.subscription_expiry && new Date(venue.subscription_expiry) < new Date();
+                const statusColor = isExpired ? 'color: #dc3545;' : 'color: #28a745;';
+                const statusText = venue.subscription_status || 'active';
+
+                // Get business name with fallback
+                const businessName = business ? (business.name || business.business_name || 'Unknown') : 'Unknown Business';
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${venue.venue_name}</strong></td>
+                    <td>${businessName}</td>
+                    <td>${venue.state}</td>
+                    <td>${venue.location || '-'}</td>
+                    <td><span style="background: #667eea; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.85em;">${venue.subscription_plan || '-'}</span></td>
+                    <td>${expiryDate}</td>
+                    <td style="${statusColor}"><strong>${statusText}</strong></td>
+                    <td>
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-outline-primary btn-sm" onclick="editVenue(${venue.id})" title="Edit Venue">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm" onclick="deleteVenue(${venue.id})" title="Delete Venue">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Populate business select dropdown
+        function populateBusinessSelect() {
+            const select = document.getElementById('businessSelect');
+            select.innerHTML = '<option value="">Choose a business...</option>';
+
+            businesses.forEach(business => {
+                const option = document.createElement('option');
+                option.value = business.id;
+                const businessName = business.name || business.business_name || 'Unknown Business';
+                option.textContent = businessName;
+                select.appendChild(option);
+            });
+        }
+
+        // Toggle venues for a business
+        async function toggleVenues(businessId, button) {
+            const venuesRow = document.getElementById(`venues-${businessId}`);
+            const venuesList = document.getElementById(`venues-list-${businessId}`);
+
+            if (venuesRow.classList.contains('show')) {
+                venuesRow.classList.remove('show');
+                button.textContent = 'Show Venues';
+            } else {
+                venuesRow.classList.add('show');
+                button.textContent = 'Hide Venues';
+
+                // Load venues for this business
+                const businessVenues = venues.filter(v => v.business_id === businessId);
+                if (businessVenues.length === 0) {
+                    venuesList.innerHTML = '<em>No venues found for this business.</em>';
+                } else {
+                    venuesList.innerHTML = businessVenues.map(venue =>
+                        `<div style="margin: 5px 0; padding: 10px; background: white; border-radius: 5px; border-left: 3px solid #667eea;">
+                            <strong>${venue.venue_name}</strong> - ${venue.state}
+                            <br><small style="color: #6c757d;">📍 ${venue.location || 'No location specified'}</small>
+                            <br><small style="color: #6c757d;">📋 Plan: ${venue.subscription_plan || 'N/A'} | Status: ${venue.subscription_status || 'active'}</small>
+                        </div>`
+                    ).join('');
+                }
+            }
+        }
+
+        // Search functions
+        function filterBusinesses() {
+            const searchTerm = document.getElementById('businessSearch').value.toLowerCase();
+            const filtered = businesses.filter(business => {
+                const businessName = business.name || business.business_name || '';
+                const ownerName = business.owner_name || '';
+                const businessCode = business.business_code || '';
+                return businessName.toLowerCase().includes(searchTerm) ||
+                       businessCode.toLowerCase().includes(searchTerm) ||
+                       ownerName.toLowerCase().includes(searchTerm);
+            });
+            renderBusinessTable(filtered);
+        }
+
+        function filterVenues() {
+            const searchTerm = document.getElementById('venueSearch').value.toLowerCase();
+            const filtered = venues.filter(venue => {
+                const business = businesses.find(b => b.id === venue.business_id);
+                const businessName = business ? (business.name || business.business_name || '') : '';
+                const venueName = venue.venue_name || '';
+                return venueName.toLowerCase().includes(searchTerm) ||
+                       businessName.toLowerCase().includes(searchTerm) ||
+                       (venue.location && venue.location.toLowerCase().includes(searchTerm));
+            });
+            renderVenueTable(filtered);
+        }
+
+        // Alert function
+        function showAlert(message, type) {
+            const alert = document.getElementById('alert');
+            alert.textContent = message;
+            alert.className = `alert ${type}`;
+            alert.style.display = 'block';
+
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+
+        // Business edit function
+        async function editBusiness(id) {
+            const business = businesses.find(b => b.id === id);
+            if (!business) {
+                showAlert('Business not found', 'error');
+                return;
+            }
+
+            // Populate edit form with existing data
+            document.getElementById('editBusinessName').value = business.name || business.business_name || '';
+            document.getElementById('editAbn').value = business.abn || '';
+            document.getElementById('editOwnerName').value = business.owner_name || '';
+            document.getElementById('editState').value = business.state || '';
+            document.getElementById('editLocation').value = business.location || '';
+            document.getElementById('editContactEmail').value = business.contact_email || '';
+
+            // Store the business ID for the update
+            document.getElementById('editBusinessForm').dataset.businessId = id;
+
+            // Show the edit modal using Bootstrap
+            const editModal = new bootstrap.Modal(document.getElementById('editBusinessModal'));
+            editModal.show();
+        }
+
+        // Handle business update
+        async function handleBusinessUpdate(e) {
+            e.preventDefault();
+
+            const businessId = e.target.dataset.businessId;
+            const formData = new FormData(e.target);
+
+            const businessData = {
+                business_name: formData.get('editBusinessName'),
+                abn: formData.get('editAbn'),
+                owner_name: formData.get('editOwnerName'),
+                state: formData.get('editState'),
+                location: formData.get('editLocation'),
+                contact_email: formData.get('editContactEmail')
+            };
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/businesses/${businessId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(businessData)
+                });
+
+                if (response.ok) {
+                    showAlert('Business updated successfully!', 'success');
+                    const editModal = bootstrap.Modal.getInstance(document.getElementById('editBusinessModal'));
+                    editModal.hide();
+                    loadBusinesses(); // Reload the businesses list
+                    updateStats();
+                } else {
+                    const error = await response.text();
+                    showAlert('Error updating business: ' + error, 'error');
+                }
+            } catch (error) {
+                showAlert('Network error: ' + error.message, 'error');
+            }
+        }
+
+
+        // Render business pagination
+        function renderBusinessPagination() {
+            const paginationContainer = document.getElementById('businessPagination');
+            const paginationInfo = document.getElementById('businessPaginationInfo');
+            const prevButton = document.getElementById('prevBusinessPage');
+            const nextButton = document.getElementById('nextBusinessPage');
+            const pageNumbers = document.getElementById('businessPageNumbers');
+
+            if (businessPagination.totalPages <= 1) {
+                paginationContainer.style.display = 'none';
+                return;
+            }
+
+            paginationContainer.style.display = 'flex';
+
+            // Update pagination info
+            const start = (businessPagination.currentPage - 1) * businessPagination.itemsPerPage + 1;
+            const end = Math.min(start + businessPagination.itemsPerPage - 1, businessPagination.totalItems);
+            paginationInfo.textContent = `Showing ${start}-${end} of ${businessPagination.totalItems} businesses`;
+
+            // Update prev/next buttons
+            prevButton.disabled = businessPagination.currentPage === 1;
+            nextButton.disabled = businessPagination.currentPage === businessPagination.totalPages;
+
+            // Generate page numbers
+            pageNumbers.innerHTML = '';
+            const maxVisiblePages = 5;
+            const startPage = Math.max(1, businessPagination.currentPage - Math.floor(maxVisiblePages / 2));
+            const endPage = Math.min(businessPagination.totalPages, startPage + maxVisiblePages - 1);
+
+            for (let i = startPage; i <= endPage; i++) {
+                const pageBtn = document.createElement('span');
+                pageBtn.className = `page-number ${i === businessPagination.currentPage ? 'active' : ''}`;
+                pageBtn.textContent = i;
+                pageBtn.onclick = () => goToPage('business', i);
+                pageNumbers.appendChild(pageBtn);
+            }
+        }
+
+        // Render venue pagination
+        function renderVenuePagination() {
+            const paginationContainer = document.getElementById('venuePagination');
+            const paginationInfo = document.getElementById('venuePaginationInfo');
+            const prevButton = document.getElementById('prevVenuePage');
+            const nextButton = document.getElementById('nextVenuePage');
+            const pageNumbers = document.getElementById('venuePageNumbers');
+
+            if (venuePagination.totalPages <= 1) {
+                paginationContainer.style.display = 'none';
+                return;
+            }
+
+            paginationContainer.style.display = 'flex';
+
+            // Update pagination info
+            const start = (venuePagination.currentPage - 1) * venuePagination.itemsPerPage + 1;
+            const end = Math.min(start + venuePagination.itemsPerPage - 1, venuePagination.totalItems);
+            paginationInfo.textContent = `Showing ${start}-${end} of ${venuePagination.totalItems} venues`;
+
+            // Update prev/next buttons
+            prevButton.disabled = venuePagination.currentPage === 1;
+            nextButton.disabled = venuePagination.currentPage === venuePagination.totalPages;
+
+            // Generate page numbers
+            pageNumbers.innerHTML = '';
+            const maxVisiblePages = 5;
+            const startPage = Math.max(1, venuePagination.currentPage - Math.floor(maxVisiblePages / 2));
+            const endPage = Math.min(venuePagination.totalPages, startPage + maxVisiblePages - 1);
+
+            for (let i = startPage; i <= endPage; i++) {
+                const pageBtn = document.createElement('span');
+                pageBtn.className = `page-number ${i === venuePagination.currentPage ? 'active' : ''}`;
+                pageBtn.textContent = i;
+                pageBtn.onclick = () => goToPage('venue', i);
+                pageNumbers.appendChild(pageBtn);
+            }
+        }
+
+        // Navigate to specific page
+        function goToPage(type, page) {
+            if (type === 'business') {
+                loadBusinesses(page);
+            } else if (type === 'venue') {
+                loadVenues(page);
+            }
+        }
+
+        // Change page (previous/next)
+        function changePage(type, direction) {
+            if (type === 'business') {
+                const newPage = businessPagination.currentPage + direction;
+                if (newPage >= 1 && newPage <= businessPagination.totalPages) {
+                    loadBusinesses(newPage);
+                }
+            } else if (type === 'venue') {
+                const newPage = venuePagination.currentPage + direction;
+                if (newPage >= 1 && newPage <= venuePagination.totalPages) {
+                    loadVenues(newPage);
+                }
+            }
+        }
+
+        // Edit venue function
+        async function editVenue(id) {
+            const venue = venues.find(v => v.id === id);
+            if (!venue) {
+                showAlert('Venue not found', 'error');
+                return;
+            }
+
+            // Populate business dropdown in edit form
+            const editBusinessSelect = document.getElementById('editVenueBusinessSelect');
+            editBusinessSelect.innerHTML = '<option value="">Choose business...</option>';
+            businesses.forEach(business => {
+                const option = document.createElement('option');
+                option.value = business.id;
+                option.textContent = business.name || business.business_name;
+                if (business.id === venue.business_id) {
+                    option.selected = true;
+                }
+                editBusinessSelect.appendChild(option);
+            });
+
+            // Populate edit form with existing data
+            document.getElementById('editVenueName').value = venue.venue_name || '';
+            document.getElementById('editVenueState').value = venue.state || '';
+            document.getElementById('editVenueLocation').value = venue.location || '';
+            document.getElementById('editSubscriptionPlan').value = venue.subscription_plan || '';
+            document.getElementById('editSubscriptionExpiry').value = venue.subscription_expiry || '';
+
+            // Store the venue ID for the update
+            document.getElementById('editVenueForm').dataset.venueId = id;
+
+            // Show the edit modal using Bootstrap
+            const editModal = new bootstrap.Modal(document.getElementById('editVenueModal'));
+            editModal.show();
+        }
+
+        // Delete venue function
+        async function deleteVenue(id) {
+            const venue = venues.find(v => v.id === id);
+            if (!venue) {
+                showAlert('Venue not found', 'error');
+                return;
+            }
+
+            // Show confirmation dialog
+            if (!confirm(`Are you sure you want to delete "${venue.venue_name}"?\n\nThis action cannot be undone.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/venues/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    showAlert('Venue deleted successfully!', 'success');
+                    loadVenues(); // Reload the venues list
+                    updateStats();
+                } else {
+                    const error = await response.text();
+                    showAlert('Error deleting venue: ' + error, 'error');
+                }
+            } catch (error) {
+                showAlert('Network error: ' + error.message, 'error');
+            }
+        }
+
+        // Handle venue update
+        async function handleVenueUpdate(e) {
+            e.preventDefault();
+            const venueId = e.target.dataset.venueId;
+            const formData = new FormData(e.target);
+
+            const venueData = {
+                business_id: parseInt(formData.get('editVenueBusinessSelect')),
+                venue_name: formData.get('editVenueName'),
+                state: formData.get('editVenueState'),
+                location: formData.get('editVenueLocation'),
+                subscription_plan: formData.get('editSubscriptionPlan'),
+                subscription_expiry: formData.get('editSubscriptionExpiry')
+            };
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/venues/${venueId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(venueData)
+                });
+
+                if (response.ok) {
+                    showAlert('Venue updated successfully!', 'success');
+                    const editModal = bootstrap.Modal.getInstance(document.getElementById('editVenueModal'));
+                    editModal.hide();
+                    loadVenues(); // Reload the venues list
+                    updateStats();
+                } else {
+                    const error = await response.text();
+                    showAlert('Error updating venue: ' + error, 'error');
+                }
+            } catch (error) {
+                showAlert('Network error: ' + error.message, 'error');
+            }
+        }
+    </script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

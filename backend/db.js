@@ -1,32 +1,19 @@
 // backend/db.js
-const sqlite3 = require("sqlite3").verbose();
+const sqlite3 = require('sqlite3').verbose();
+const path = require('path');
 
-// Use __dirname so DB stays in backend folder
-const db = new sqlite3.Database(__dirname + "/database.sqlite");
+const DB_PATH = process.env.DB_PATH || path.join(__dirname, 'database.sqlite');
 
-db.serialize(() => {
-  // Users table
-  db.run(`
-    CREATE TABLE IF NOT EXISTS users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      username TEXT UNIQUE NOT NULL,
-      password_hash TEXT NOT NULL,
-      role TEXT CHECK(role IN ('staff','manager')) NOT NULL,
-      staff_id INTEGER,
-      venue_id INTEGER,
-      business_id INTEGER,
-      active INTEGER DEFAULT 1,
-      created_at DATETIME DEFAULT (datetime('now'))
-    )
-  `);
-
-  // Example: staff table (if not already created)
-  db.run(`
-    CREATE TABLE IF NOT EXISTS staff (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT
-    )
-  `);
+const db = new sqlite3.Database(DB_PATH, (err) => {
+  if (err) {
+    console.error('Failed to open DB:', err);
+    process.exit(1);
+  }
+  console.log('Connected to SQLite DB at', DB_PATH);
 });
 
+// Enable foreign keys
+db.run('PRAGMA foreign_keys = ON');
+
+// Export the db instance
 module.exports = db;

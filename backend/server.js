@@ -609,6 +609,260 @@ app.get("/api/shifts/:staffId/active", (req, res) => {
   );
 });
 
+// ---- Business API Endpoints ----
+
+// LIST businesses with pagination
+app.get('/api/businesses', (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const offset = (page - 1) * limit;
+
+  // Get total count for pagination info
+  db.get('SELECT COUNT(*) as total FROM businesses', [], (countErr, countResult) => {
+    if (countErr) {
+      console.error('Error counting businesses:', countErr);
+      return res.status(500).json({ error: countErr.message });
+    }
+
+    const total = countResult.total;
+    const totalPages = Math.ceil(total / limit);
+
+    // Get paginated data
+    db.all('SELECT * FROM businesses ORDER BY id DESC LIMIT ? OFFSET ?', [limit, offset], (err, rows) => {
+      if (err) {
+        console.error('Error fetching businesses:', err);
+        return res.status(500).json({ error: err.message });
+      }
+
+      res.json({
+        data: rows,
+        pagination: {
+          currentPage: page,
+          totalPages: totalPages,
+          totalItems: total,
+          itemsPerPage: limit,
+          hasNextPage: page < totalPages,
+          hasPrevPage: page > 1
+        }
+      });
+    });
+  });
+});
+
+// CREATE business
+app.post('/api/businesses', (req, res) => {
+  const { business_name, abn, owner_name, state, location, contact_email } = req.body;
+
+  if (!business_name) {
+    return res.status(400).json({ error: 'business_name is required' });
+  }
+
+  db.run(
+    `INSERT INTO businesses (name, abn, owner_name, state, location, contact_email) VALUES (?, ?, ?, ?, ?, ?)`,
+    [business_name, abn || null, owner_name || null, state || null, location || null, contact_email || null],
+    function (err) {
+      if (err) {
+        console.error('Error creating business:', err);
+        return res.status(500).json({ error: err.message });
+      }
+
+      const id = this.lastID;
+      const code = 10000000 + id;
+
+      // Set business code (triggers should handle this, but this ensures it's set)
+      db.run('UPDATE businesses SET business_code = ?, updated_at = datetime("now") WHERE id = ?', [code, id], function (uerr) {
+        if (uerr) {
+          console.error('Error updating business code:', uerr);
+          return res.status(500).json({ error: uerr.message });
+        }
+
+        // Return the created business
+        db.get('SELECT * FROM businesses WHERE id = ?', [id], (gerr, row) => {
+          if (gerr) {
+            console.error('Error fetching created business:', gerr);
+            return res.status(500).json({ error: gerr.message });
+          }
+          res.json(row);
+        });
+      });
+    }
+  );
+});
+
+// UPDATE business
+app.put('/api/businesses/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const { business_name, abn, owner_name, state, location, contact_email } = req.body;
+
+  db.run(
+    `UPDATE businesses SET name = ?, abn = ?, owner_name = ?, state = ?, location = ?, contact_email = ?, updated_at = datetime('now') WHERE id = ?`,
+    [business_name, abn, owner_name, state, location, contact_email, id],
+    function (err) {
+      if (err) {
+        console.error('Error updating business:', err);
+        return res.status(500).json({ error: err.message });
+      }
+
+      db.get('SELECT * FROM businesses WHERE id = ?', [id], (gerr, row) => {
+        if (gerr) {
+          console.error('Error fetching updated business:', gerr);
+          return res.status(500).json({ error: gerr.message });
+        }
+        res.json(row);
+      });
+    }
+  );
+});
+
+// DELETE business
+app.delete('/api/businesses/:id', (req, res) => {
+  const id = Number(req.params.id);
+
+  db.run('DELETE FROM businesses WHERE id = ?', [id], function (err) {
+    if (err) {
+      console.error('Error deleting business:', err);
+      return res.status(500).json({ error: err.message });
+    }
+    res.json({ success: true, id });
+  });
+});
+
+// ---- Venues API Endpoints ----
+
+// LIST venues with pagination (optionally filter by business_id)
+app.get('/api/venues', (req, res) => {
+  const businessId = req.query.business_id;
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const offset = (page - 1) * limit;
+
+  // Build SQL queries based on business_id filter
+  const countSql = businessId ? 'SELECT COUNT(*) as total FROM venues WHERE business_id = ?' : 'SELECT COUNT(*) as total FROM venues';
+  const dataSql = businessId ? 'SELECT * FROM venues WHERE business_id = ? ORDER BY id DESC LIMIT ? OFFSET ?' : 'SELECT * FROM venues ORDER BY id DESC LIMIT ? OFFSET ?';
+  const countParams = businessId ? [businessId] : [];
+  const dataParams = businessId ? [businessId, limit, offset] : [limit, offset];
+
+  // Get total count for pagination info
+  db.get(countSql, countParams, (countErr, countResult) => {
+    if (countErr) {
+      console.error('Error counting venues:', countErr);
+      return res.status(500).json({ error: countErr.message });
+    }
+
+    const total = countResult.total;
+    const totalPages = Math.ceil(total / limit);
+
+    // Get paginated data
+    db.all(dataSql, dataParams, (err, rows) => {
+      if (err) {
+        console.error('Error fetching venues:', err);
+        return res.status(500).json({ error: err.message });
+      }
+
+      res.json({
+        data: rows,
+        pagination: {
+          currentPage: page,
+          totalPages: totalPages,
+          totalItems: total,
+          itemsPerPage: limit,
+          hasNextPage: page < totalPages,
+          hasPrevPage: page > 1
+        }
+      });
+    });
+  });
+});
+
+// CREATE venue (all fields required)
+app.post('/api/venues', (req, res) => {
+  const { business_id, venue_name, state, location, subscription_plan, subscription_expiry, subscription_status } = req.body;
+
+  if (!business_id || !venue_name || !state || !location || !subscription_plan || !subscription_expiry) {
+    return res.status(400).json({ error: 'All venue fields are required: business_id, venue_name, state, location, subscription_plan, subscription_expiry' });
+  }
+
+  // Verify business exists
+  db.get('SELECT id FROM businesses WHERE id = ?', [business_id], (err, businessRow) => {
+    if (err) {
+      console.error('Error checking business:', err);
+      return res.status(500).json({ error: err.message });
+    }
+    if (!businessRow) {
+      return res.status(400).json({ error: 'Business not found' });
+    }
+
+    db.run(
+      `INSERT INTO venues (business_id, venue_name, state, location, subscription_plan, subscription_expiry, subscription_status) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [business_id, venue_name, state, location, subscription_plan, subscription_expiry, subscription_status || 'active'],
+      function (ierr) {
+        if (ierr) {
+          console.error('Error creating venue:', ierr);
+          return res.status(500).json({ error: ierr.message });
+        }
+
+        const id = this.lastID;
+        const vcode = 20000000 + id;
+
+        // Set venue code (triggers should handle this, but this ensures it's set)
+        db.run('UPDATE venues SET venue_code = ?, updated_at = datetime("now") WHERE id = ?', [vcode, id], function (uerr) {
+          if (uerr) {
+            console.error('Error updating venue code:', uerr);
+            return res.status(500).json({ error: uerr.message });
+          }
+
+          // Return the created venue
+          db.get('SELECT * FROM venues WHERE id = ?', [id], (gerr, row) => {
+            if (gerr) {
+              console.error('Error fetching created venue:', gerr);
+              return res.status(500).json({ error: gerr.message });
+            }
+            res.json(row);
+          });
+        });
+      }
+    );
+  });
+});
+
+// UPDATE venue
+app.put('/api/venues/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const { venue_name, state, location, subscription_status, subscription_plan, subscription_expiry } = req.body;
+
+  db.run(
+    `UPDATE venues SET venue_name = ?, state = ?, location = ?, subscription_status = ?, subscription_plan = ?, subscription_expiry = ?, updated_at = datetime('now') WHERE id = ?`,
+    [venue_name, state, location, subscription_status, subscription_plan, subscription_expiry, id],
+    function (err) {
+      if (err) {
+        console.error('Error updating venue:', err);
+        return res.status(500).json({ error: err.message });
+      }
+
+      db.get('SELECT * FROM venues WHERE id = ?', [id], (gerr, row) => {
+        if (gerr) {
+          console.error('Error fetching updated venue:', gerr);
+          return res.status(500).json({ error: gerr.message });
+        }
+        res.json(row);
+      });
+    }
+  );
+});
+
+// DELETE venue
+app.delete('/api/venues/:id', (req, res) => {
+  const id = Number(req.params.id);
+
+  db.run('DELETE FROM venues WHERE id = ?', [id], function (err) {
+    if (err) {
+      console.error('Error deleting venue:', err);
+      return res.status(500).json({ error: err.message });
+    }
+    res.json({ success: true, id });
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`✅ Server running at http://localhost:${PORT}`);
 });

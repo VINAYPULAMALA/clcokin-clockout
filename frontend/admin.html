@@ -411,6 +411,24 @@
                        
                         <!-- Step 1: Personal Information -->
                         <div class="wizard-step" id="step1" style="display: block;">
+
+                        <!-- Business & Venue Assignment -->
+                        <h6 class="text-success mb-3"><i class="bi bi-building"></i> Business & Venue Assignment</h6>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label for="businessSelect" class="form-label">Select Business</label>
+                                <select class="form-select" id="businessSelect" name="businessSelect" required onchange="loadVenuesForBusiness()">
+                                    <option value="">Choose Business...</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="venueSelect" class="form-label">Select Venue</label>
+                                <select class="form-select" id="venueSelect" name="venueSelect" required>
+                                    <option value="">First select a business</option>
+                                </select>
+                            </div>
+                        </div>
+
                         <h6 class="text-primary mb-3"><i class="bi bi-person"></i> Personal Information</h6>
                         <div class="row g-3">
                             <div class="col-md-4">
