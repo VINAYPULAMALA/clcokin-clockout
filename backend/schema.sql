@@ -1,18 +1,23 @@
 PRAGMA foreign_keys = ON;
 
+-- ==============================
+-- Businesses
+-- ==============================
 CREATE TABLE businesses (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   business_code INTEGER UNIQUE,
   name TEXT NOT NULL,
-  abn TEXT,
-  owner_name TEXT,
-  state TEXT,
-  location TEXT,
-  contact_email TEXT,
-  created_at DATETIME DEFAULT (datetime('now')),
+  owner_name TEXT NOT NULL,
+  state TEXT NOT NULL,
+  location TEXT NOT NULL,
+  contact_email TEXT NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME
 );
 
+-- ==============================
+-- Venues (with kiosk login)
+-- ==============================
 CREATE TABLE venues (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   venue_code INTEGER UNIQUE,
@@ -20,97 +25,83 @@ CREATE TABLE venues (
   venue_name TEXT NOT NULL,
   state TEXT NOT NULL,
   location TEXT NOT NULL,
-  subscription_status TEXT NOT NULL DEFAULT 'active',
-  subscription_plan TEXT NOT NULL DEFAULT 'standard',
-  subscription_expiry DATE NOT NULL,
-  created_at DATETIME DEFAULT (datetime('now')),
+  contact_email TEXT,
+  kiosk_username TEXT NOT NULL,
+  kiosk_password TEXT NOT NULL,
+  status TEXT DEFAULT 'active',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME,
-  FOREIGN KEY (business_id) REFERENCES businesses(id) ON DELETE CASCADE
+  FOREIGN KEY (business_id) REFERENCES businesses(id)
 );
 
+-- ==============================
+-- Staff
+-- ==============================
 CREATE TABLE staff (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   staff_code INTEGER UNIQUE,
   business_id INTEGER NOT NULL,
   venue_id INTEGER NOT NULL,
-  first_name TEXT,
+  first_name TEXT NOT NULL,
   middle_name TEXT,
-  last_name TEXT,
-  dob DATE,
+  last_name TEXT NOT NULL,
+  dob TEXT,
   gender TEXT,
-  visa_status TEXT,
   full_address TEXT,
   emergency_contact_name TEXT,
   emergency_contact_phone TEXT,
   created_by INTEGER,
-  created_at DATETIME DEFAULT (datetime('now')),
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME,
   FOREIGN KEY (business_id) REFERENCES businesses(id),
   FOREIGN KEY (venue_id) REFERENCES venues(id)
 );
 
+-- ==============================
+-- Staff Employment
+-- ==============================
+CREATE TABLE staff_employment (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  staff_id INTEGER NOT NULL,
+  employment_type TEXT DEFAULT 'full_time',
+  role_title TEXT,
+  start_date DATE NOT NULL,
+  employment_status TEXT DEFAULT 'active',
+  default_hours_per_week INTEGER DEFAULT 40,
+  pay_frequency TEXT DEFAULT 'monthly',
+  weekday_rate REAL DEFAULT 0,
+  saturday_rate REAL DEFAULT 0,
+  sunday_rate REAL DEFAULT 0,
+  public_holiday_rate REAL DEFAULT 0,
+  overtime_rate REAL DEFAULT 0,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME,
+  FOREIGN KEY (staff_id) REFERENCES staff(id)
+);
+
+-- ==============================
+-- Users (Admin + Staff logins)
+-- ==============================
 CREATE TABLE users (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   username TEXT NOT NULL,
   password_hash TEXT NOT NULL,
-  role TEXT,
-  status TEXT,
+  access_level TEXT NOT NULL, -- system_admin, manager, supervisor, employee
+  status TEXT DEFAULT 'active',
   staff_id INTEGER,
-  venue_id INTEGER,
-  business_id INTEGER,
-  created_at DATETIME DEFAULT (datetime('now')),
+  venue_id INTEGER NOT NULL,
+  business_id INTEGER NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME,
-  UNIQUE (business_id, username),
   FOREIGN KEY (staff_id) REFERENCES staff(id),
   FOREIGN KEY (venue_id) REFERENCES venues(id),
-  FOREIGN KEY (business_id) REFERENCES businesses(id)
+  FOREIGN KEY (business_id) REFERENCES businesses(id),
+  UNIQUE (venue_id, username)
 );
 
-CREATE TABLE staff_employment (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  staff_id INTEGER UNIQUE NOT NULL,
-  employment_type TEXT,
-  role_title TEXT,
-  award_level TEXT,
-  start_date DATE,
-  employment_status TEXT,
-  default_hours_per_week INTEGER,
-  weekday_rate REAL,
-  saturday_rate REAL,
-  sunday_rate REAL,
-  public_holiday_rate REAL,
-  overtime_rate REAL,
-  pay_frequency TEXT,
-  created_at DATETIME DEFAULT (datetime('now')),
-  updated_at DATETIME,
-  FOREIGN KEY (staff_id) REFERENCES staff(id)
-);
-
-CREATE TABLE staff_compliance (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  staff_id INTEGER UNIQUE NOT NULL,
-  tfn TEXT,
-  superfund_name TEXT,
-  super_member_id TEXT,
-  payroll_ref TEXT,
-  bank_account_name TEXT,
-  bank_bsb TEXT,
-  bank_account_number TEXT,
-  bank_name TEXT,
-  created_at DATETIME DEFAULT (datetime('now')),
-  updated_at DATETIME,
-  FOREIGN KEY (staff_id) REFERENCES staff(id)
-);
-
-CREATE TABLE staff_documents (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  staff_id INTEGER UNIQUE NOT NULL,
-  contract_file TEXT,
-  created_at DATETIME DEFAULT (datetime('now')),
-  updated_at DATETIME,
-  FOREIGN KEY (staff_id) REFERENCES staff(id)
-);
-
+-- ==============================
+-- Staff Shifts (Kiosk clock-in/out)
+-- ==============================
 CREATE TABLE staff_shifts (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   staff_id INTEGER NOT NULL,
@@ -118,15 +109,48 @@ CREATE TABLE staff_shifts (
   venue_id INTEGER NOT NULL,
   clock_in DATETIME,
   clock_out DATETIME,
-  duration REAL,
-  payday_type TEXT,
-  hourly_rate REAL,
+  payday TEXT,
+  hours_worked REAL,
   total_pay REAL,
-  approved_by INTEGER,
-  created_at DATETIME DEFAULT (datetime('now')),
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (staff_id) REFERENCES staff(id),
+  FOREIGN KEY (business_id) REFERENCES businesses(id),
+  FOREIGN KEY (venue_id) REFERENCES venues(id)
+);
+
+-- ==============================
+-- Rosters (scheduling)
+-- ==============================
+CREATE TABLE rosters (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  staff_id INTEGER NOT NULL,
+  business_id INTEGER NOT NULL,
+  venue_id INTEGER NOT NULL,
+  shift_date DATE NOT NULL,
+  start_time TEXT NOT NULL,
+  end_time TEXT NOT NULL,
+  status TEXT DEFAULT 'scheduled',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME,
   FOREIGN KEY (staff_id) REFERENCES staff(id),
   FOREIGN KEY (business_id) REFERENCES businesses(id),
-  FOREIGN KEY (venue_id) REFERENCES venues(id),
-  FOREIGN KEY (approved_by) REFERENCES users(id)
+  FOREIGN KEY (venue_id) REFERENCES venues(id)
+);
+
+-- ==============================
+-- Payroll (future-proof, optional)
+-- ==============================
+CREATE TABLE payroll (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  staff_id INTEGER NOT NULL,
+  business_id INTEGER NOT NULL,
+  venue_id INTEGER NOT NULL,
+  period_start DATE NOT NULL,
+  period_end DATE NOT NULL,
+  hours_worked REAL DEFAULT 0,
+  total_pay REAL DEFAULT 0,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (staff_id) REFERENCES staff(id),
+  FOREIGN KEY (business_id) REFERENCES businesses(id),
+  FOREIGN KEY (venue_id) REFERENCES venues(id)
 );

@@ -2,7 +2,7 @@
 
 DutyDeck is an all-in-one platform for Staff Management (SMS), Booking System, Point of Sale (POS), and Business Analytics designed specifically for Australian businesses with built-in compliance features.
 
-## 🚀 Quick Start
+## 🚀 Quick Start (v2.0.2)
 
 ### Prerequisites
 
@@ -11,6 +11,14 @@ Before you begin, ensure you have the following installed on your system:
 - **Node.js** (version 14.0 or higher) - [Download here](https://nodejs.org/)
 - **Git** - [Download here](https://git-scm.com/)
 - **Web Browser** (Chrome, Firefox, Safari, or Edge)
+
+### ⭐ What's New in v2.0.2
+- **Complete sample database** with realistic demo data
+- **Enhanced Master Panel** with full business setup workflows
+- **Improved authentication system** with multiple user roles
+- **Production-ready kiosk interface** for staff clock-in/out
+- **Comprehensive payroll calculations** with Australian award rates
+- **Real-time analytics dashboard** with business insights
 
 ### Installation Steps
 
@@ -26,11 +34,19 @@ Before you begin, ensure you have the following installed on your system:
    npm install
    ```
 
-3. **Initialize Database**
+3. **Initialize Database with Demo Data**
    ```bash
-   # The SQLite database will be created automatically on first run
-   # Database file: backend/database.sqlite
+   cd backend
+   # Run the database reset script to create clean database with comprehensive demo data
+   ./reset.sh
    ```
+
+   ⭐ **This project includes complete sample data for immediate testing:**
+   - Pre-configured business and venue data
+   - Sample staff members with different roles
+   - Demo shift records and payroll data
+   - Australian public holidays configuration
+   - Ready-to-use authentication accounts
 
 4. **Start the Backend Server**
    ```bash
@@ -48,9 +64,10 @@ Before you begin, ensure you have the following installed on your system:
    Open your web browser and navigate to:
 
    - **Main Application**: `http://localhost:4000/`
+   - **🛠️ Master Panel**: `http://localhost:4000/master.html` ⭐ **NEW**
    - **Admin Portal**: `http://localhost:4000/admin.html`
    - **Staff Portal**: `http://localhost:4000/staff.html`
-   - **Master Portal**: `http://localhost:4000/master.html`
+   - **🖥️ Kiosk Interface**: `http://localhost:4000/kiosk.html`
    - **Investor Presentation**: `http://localhost:4000/investors/`
 
 ## 🏗️ Project Structure
@@ -58,19 +75,28 @@ Before you begin, ensure you have the following installed on your system:
 ```
 dutydeck/
 ├── backend/
+│   ├── routes/
+│   │   ├── master.js       # 🛠️ Master panel API (NEW)
+│   │   ├── dashboard.js    # Dashboard statistics API
+│   │   └── kiosk.js        # Kiosk clock-in/out API
 │   ├── server.js           # Express server & API endpoints
+│   ├── authMiddleware.js   # Authentication system
 │   ├── db.js              # Database operations
 │   ├── schema.sql         # Database structure
 │   ├── database.sqlite    # SQLite database (auto-created)
 │   ├── package.json       # Backend dependencies
 │   └── node_modules/      # Backend packages
 ├── frontend/
+│   ├── css/
+│   │   ├── master.css      # 🛠️ Master panel styling (NEW)
+│   │   └── kiosk.css       # Kiosk interface styling
+│   ├── js/
+│   │   ├── master.js       # 🛠️ Master panel logic (NEW)
+│   │   └── kiosk.js        # Kiosk functionality
 │   ├── index.html         # Login/authentication page
 │   ├── admin.html         # Staff management console
-│   ├── staff.html         # Employee clock-in/out portal
-│   ├── master.html        # Business & venue management
-│   ├── *.css              # Styling files
-│   ├── *.js               # Frontend JavaScript
+│   ├── master.html        # 🛠️ Business & venue bootstrap (NEW)
+│   ├── kiosk.html         # Touch-friendly staff kiosk
 │   └── public-holidays-config.js # Australian holidays
 ├── investors/
 │   ├── index.html         # Investor presentation
@@ -84,10 +110,13 @@ dutydeck/
 
 ### Three-Tier Management System
 
-1. **Master Portal** (`/master.html`)
-   - Business owners and system administrators
-   - Manage multiple businesses and venues
-   - Performance analytics and oversight
+1. **🛠️ Master Panel** (`/master.html`) ⭐ **NEW**
+   - **Developer bootstrap interface** for initial system setup
+   - **Professional sidebar design** with dark teal theme
+   - **Business creation** with comprehensive details
+   - **Venue + System Admin setup** in atomic transactions
+   - **Live dashboard** with growth statistics and analytics
+   - **Kiosk credential management** for each venue
 
 2. **Admin Console** (`/admin.html`)
    - Operations managers
@@ -110,17 +139,34 @@ dutydeck/
 
 ## 👥 Default Login Credentials
 
-### Test Accounts
+### Demo Accounts (Created by reset.sh)
 
-- **Manager Account**
-  - Username: `bondi_manager`
+⭐ **Ready-to-use accounts with complete demo data:**
+
+- **System Admin Account**
+  - Username: `admin`
+  - Password: `admin123`
+  - Role: `system_admin`
+  - Access: Master Panel, Admin Console
+
+- **Business Manager Account**
+  - Username: `manager`
+  - Password: `manager123`
+  - Role: `business_admin`
+  - Access: Admin Console, Staff Management
+
+- **Employee Account**
+  - Username: `johndoe`
   - Password: `password123`
+  - Role: `employee`
+  - Access: Staff Portal, Kiosk
 
-- **Staff Account**
-  - Username: `alice`
-  - Password: `password123`
+- **Demo Kiosk Credentials**
+  - Kiosk Username: `kiosk_main`
+  - Kiosk Password: `kiosk123`
+  - Location: Main Venue
 
-## 🗄️ Database Schema
+## 🗄️ Database Schema & Sample Data
 
 The platform uses a normalized SQLite database with the following structure:
 
@@ -131,6 +177,15 @@ The platform uses a normalized SQLite database with the following structure:
 - **staff_compliance** - Tax and banking details
 - **staff_shifts** - Time tracking and shift records
 - **users** - Authentication and access control
+
+### ⭐ Sample Data Included (v2.0.2)
+The `reset.sh` script creates a fully populated demo environment:
+- **3 Sample businesses** with complete profiles
+- **5 Venues** across different locations
+- **15+ Staff members** with various roles and pay rates
+- **50+ Shift records** showing realistic work patterns
+- **Complete payroll data** with award rate calculations
+- **Public holiday configurations** for Australian compliance
 
 ## 🔧 Configuration
 
@@ -144,13 +199,20 @@ The application runs on:
 
 Australian public holidays are configured in `frontend/public-holidays-config.js`. You can modify this file to add or update holiday dates.
 
-### Database Customization
+### Database Reset
 
-To reset or modify the database:
-1. Stop the server
-2. Delete `backend/database.sqlite`
-3. Modify `backend/schema.sql` if needed
-4. Restart the server (database will be recreated)
+To reset the database with clean demo data:
+```bash
+cd backend
+./reset.sh
+```
+
+This script will:
+- Backup the current database
+- Delete the old database
+- Create fresh schema from `schema.sql`
+- Apply triggers from `code_triggers.sql`
+- Insert demo data from `seed.sql`
 
 ## 🚀 Deployment
 
@@ -174,6 +236,13 @@ node server.js
 
 ### Authentication
 - `POST /login` - User authentication
+
+### Master Panel API ⭐ **NEW**
+- `GET /api/master/stats` - Dashboard statistics with growth indicators
+- `GET /api/master/businesses` - List businesses for tables and dropdowns
+- `POST /api/master/business` - Create new business with validation
+- `GET /api/master/venues` - List venues with business relationships
+- `POST /api/master/venue-with-admin` - Atomic venue + system admin creation
 
 ### Business Management
 - `GET /api/businesses` - List all businesses
@@ -257,20 +326,27 @@ This project is proprietary software. All rights reserved.
 ---
 
 **Last Updated**: September 2025
-**Version**: 2.0
-**Status**: Production Ready
+**Version**: 2.0.2
+**Status**: Production Ready with Demo Data
 
 ## 🎯 Next Steps After Installation
 
-1. **Explore the Platform**
+1. **🛠️ Start with Master Panel** ⭐ **NEW**
+   - Open `http://localhost:4000/master.html`
+   - Create your business with owner details and location
+   - Set up venues with kiosk credentials and system admins
+   - Monitor dashboard statistics in real-time
+
+2. **Explore the Platform**
    - Start with the investor presentation (`/investors/`)
+   - Use the master panel for initial business setup
    - Login to admin console to see staff management
    - Test the staff portal for clock in/out functionality
 
-2. **Customize for Your Business**
-   - Add your business information in master portal
-   - Configure venues and locations
-   - Set up staff members and pay rates
+3. **Customize for Your Business**
+   - Use master panel to create business infrastructure
+   - Configure venues and locations with proper credentials
+   - Set up staff members and pay rates through admin console
 
 3. **Production Setup**
    - Configure proper authentication

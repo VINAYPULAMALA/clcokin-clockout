@@ -6,7 +6,7 @@
     <title>Staff Management System - Login</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
-    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="css/login.css">
 </head>
 <body>
     <div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center px-3">
@@ -23,28 +23,28 @@
 
                             <!-- Console Selection -->
                             <div id="roleSelection" class="d-grid gap-3">
-                                <button class="btn btn-lg role-button admin-button" onclick="selectRole('admin')">
+                                <button class="btn btn-lg role-button admin-button" data-role="admin">
                                     <i class="bi bi-shield-fill-check me-2"></i>
                                     <span class="fw-bold">Admin Console</span>
                                     <small class="d-block mt-1 opacity-75">Staff management, analytics, reports</small>
                                 </button>
 
-                                <button class="btn btn-lg role-button staff-button" onclick="goToStaffConsole()">
+                                <button class="btn btn-lg role-button staff-button" id="staffKioskButton">
                                     <i class="bi bi-people-fill me-2"></i>
-                                    <span class="fw-bold">Staff Console</span>
-                                    <small class="d-block mt-1 opacity-75">Clock in/out, view schedules</small>
+                                    <span class="fw-bold">Staff Kiosk</span>
+                                    <small class="d-block mt-1 opacity-75">Clock in/out system</small>
                                 </button>
                             </div>
 
                             <!-- Login Form Step -->
                             <div id="loginForm" class="d-none">
-                                <form id="authForm" onsubmit="handleLogin(event)">
+                                <form id="authForm">
                                     <div class="mb-3">
                                         <div class="input-group">
                                             <span class="input-group-text bg-primary text-white border-primary">
                                                 <i class="bi bi-person"></i>
                                             </span>
-                                            <input type="text" class="form-control" id="username" placeholder="Username" required>
+                                            <input type="text" class="form-control" id="username" placeholder="Username" autocomplete="username" required>
                                         </div>
                                     </div>
                                     <div class="mb-4">
@@ -52,7 +52,7 @@
                                             <span class="input-group-text bg-primary text-white border-primary">
                                                 <i class="bi bi-lock"></i>
                                             </span>
-                                            <input type="password" class="form-control" id="password" placeholder="Password" required>
+                                            <input type="password" class="form-control" id="password" placeholder="Password" autocomplete="current-password" required>
                                         </div>
                                     </div>
 
@@ -61,7 +61,7 @@
                                             <i class="bi bi-box-arrow-in-right me-2"></i>
                                             Sign In
                                         </button>
-                                        <button type="button" class="btn btn-outline-light btn-sm" onclick="backToRoleSelection()">
+                                        <button type="button" class="btn btn-outline-light btn-sm" id="backToRoleButton">
                                             <i class="bi bi-arrow-left me-1"></i>
                                             Back to Console Selection
                                         </button>
@@ -86,113 +86,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script>
-        let selectedRole = '';
-
-        function selectRole(role) {
-            selectedRole = role;
-
-            // Update subtitle and show login form
-            const subtitle = document.getElementById('loginSubtitle');
-            const roleSelection = document.getElementById('roleSelection');
-            const loginForm = document.getElementById('loginForm');
-
-            if (role === 'admin') {
-                subtitle.textContent = 'Admin Console Login';
-                // Hide role selection, show login form
-                roleSelection.classList.add('d-none');
-                loginForm.classList.remove('d-none');
-            }
-        }
-
-        function goToStaffConsole() {
-            // Direct access to staff console without login
-            window.location.href = 'staff.html';
-        }
-
-        function backToRoleSelection() {
-            const subtitle = document.getElementById('loginSubtitle');
-            const roleSelection = document.getElementById('roleSelection');
-            const loginForm = document.getElementById('loginForm');
-            const loginMessage = document.getElementById('loginMessage');
-
-            // Reset form
-            document.getElementById('authForm').reset();
-            loginMessage.classList.add('d-none');
-
-            // Update subtitle and show role selection
-            subtitle.textContent = 'Choose your console to continue';
-            loginForm.classList.add('d-none');
-            roleSelection.classList.remove('d-none');
-            selectedRole = '';
-        }
-
-        async function handleLogin(event) {
-            event.preventDefault();
-
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const loginBtn = document.getElementById('loginBtn');
-            const loginMessage = document.getElementById('loginMessage');
-
-            // Show loading state
-            loginBtn.disabled = true;
-            loginBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Signing in...';
-
-            try {
-                const response = await fetch('http://localhost:4000/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        username: username,
-                        password: password
-                    })
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    // Success - store user data and redirect
-                    localStorage.setItem('user', JSON.stringify(data));
-
-                    showMessage('Login successful! Redirecting...', 'success');
-
-                    setTimeout(() => {
-                        // Admin login goes to admin panel
-                        window.location.href = 'admin.html';
-                    }, 1000);
-                } else {
-                    // Error
-                    showMessage(data.error || 'Login failed', 'danger');
-                }
-            } catch (error) {
-                console.error('Login error:', error);
-                showMessage('Connection error. Please check if the server is running.', 'danger');
-            }
-
-            // Reset button
-            loginBtn.disabled = false;
-            loginBtn.innerHTML = '<i class="bi bi-box-arrow-in-right me-2"></i>Sign In';
-        }
-
-        function showMessage(message, type) {
-            const loginMessage = document.getElementById('loginMessage');
-            loginMessage.className = `mt-3 alert alert-${type}`;
-            loginMessage.textContent = message;
-            loginMessage.classList.remove('d-none');
-        }
-
-        // Check if user is already logged in on page load
-        window.addEventListener('load', function() {
-            const user = localStorage.getItem('user');
-            if (user) {
-                // Everyone goes to admin panel
-                window.location.href = 'admin.html';
-            }
-        });
-    </script>
+    <script src="js/login.js"></script>
 </body>
 </html>

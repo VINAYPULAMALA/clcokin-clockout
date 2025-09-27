@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Staff Kiosk - Clock In/Out</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/kiosk.css">
+</head>
+<body>
+  <div class="container-fluid">
+    <!-- Header -->
+    <nav class="navbar navbar-expand-lg navbar-dark mb-4" style="background: #2d2d44;">
+      <div class="container">
+        <a class="navbar-brand d-flex align-items-center" href="#">
+          <i class="bi bi-people-fill me-2 fs-3"></i>
+          <span class="fw-bold">Staff Kiosk</span>
+        </a>
+        <div class="d-flex align-items-center ms-auto">
+          <span class="text-light me-3" id="venueName">Venue: Loading...</span>
+          <button class="btn btn-outline-danger btn-sm" id="logoutBtn" style="display:none;">
+            <i class="bi bi-box-arrow-right me-1"></i>Logout
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container">
+      <!-- Kiosk Login Form -->
+      <div id="kioskLogin" class="card shadow-sm">
+        <div class="card-body">
+          <h3 class="card-title text-center mb-4">
+            <i class="bi bi-door-open me-2"></i>Kiosk Login
+          </h3>
+          <div class="mb-3">
+            <input id="kioskUsername" placeholder="Venue Code" class="form-control" autocomplete="username">
+          </div>
+          <div class="mb-3">
+            <input id="kioskPassword" placeholder="Password" type="password" class="form-control" autocomplete="current-password">
+          </div>
+          <button class="btn btn-primary w-100" id="kioskLoginButton">
+            <i class="bi bi-unlock me-2"></i>Login
+          </button>
+          <div id="kioskLoginError" class="mt-3"></div>
+        </div>
+      </div>
+
+      <!-- Kiosk Panel (hidden by default) -->
+      <div id="kioskPanel" style="display:none;">
+        <!-- Staff Grid -->
+        <div id="staffGrid" class="staff-grid"></div>
+
+      <!-- Clock Section -->
+      <div class="card shadow-sm mt-4 hidden" id="clockSection">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+          <h5 class="card-title mb-0">
+            <i class="bi bi-clock me-2"></i>
+            <span id="selectedStaffName">Staff Member</span>
+          </h5>
+          <button class="btn btn-outline-light btn-sm" id="backToStaffListBtn">
+            <i class="bi bi-arrow-left me-1"></i> Back
+          </button>
+        </div>
+        <div class="card-body">
+          <!-- Status -->
+          <div class="mb-3">
+            <div id="statusDisplay" class="alert alert-info text-center">
+              Loading status...
+            </div>
+          </div>
+
+          <!-- Buttons -->
+          <div class="row g-3">
+            <div class="col-md-6">
+              <button id="clockInBtn" class="btn btn-success w-100">
+                <i class="bi bi-play-circle me-2"></i> Clock In
+              </button>
+            </div>
+            <div class="col-md-6">
+              <button id="clockOutBtn" class="btn btn-danger w-100">
+                <i class="bi bi-stop-circle me-2"></i> Clock Out
+              </button>
+            </div>
+          </div>
+
+          <!-- Message -->
+          <div id="message" class="alert mt-3 hidden"></div>
+        </div>
+      </div>
+      </div> <!-- End kioskPanel -->
+    </div>
+  </div>
+
+  <script src="js/kiosk.js"></script>
+</body>
+</html>
